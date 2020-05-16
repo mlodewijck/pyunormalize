@@ -93,28 +93,5 @@ class TestSuite(unittest.TestCase):
             [0x0105, 0x0301, 0x0302])
 
 
-
-    """
-    def test_concatenation(self):
-
-        nfc_str = "각"
-
-        # The wrong way:
-        self.assertNotEqual(NFC("ᄀ") + NFC("ᅡᆨ"), nfc_str)
-        self.assertNotEqual(NFC("가") + NFC("ᆨ"), nfc_str)
-        # The right way:
-        self.assertEqual(NFC("각"), nfc_str)
-        self.assertEqual(NFC("ᄀ" + "ᅡᆨ"), nfc_str)
-
-        nfc_str = "élève"
-
-        # The wrong way:
-        self.assertNotEqual(NFC("e\u0301le") + NFC("\u0300ve"), nfc_str)
-        # The right way:
-        self.assertEqual(NFC("e\u0301l") + NFC("e\u0300ve"), nfc_str)
-        self.assertEqual(NFC("e\u0301le" + "\u0300ve"), nfc_str)
-    """
-
-
 if __name__ == "__main__":
     unittest.main()

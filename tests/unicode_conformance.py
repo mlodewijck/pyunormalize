@@ -108,6 +108,7 @@ def main():
     # NFC
     # c2 ==  toNFC(c1) ==  toNFC(c2) ==  toNFC(c3)
     # c4 ==  toNFC(c4) ==  toNFC(c5)
+
     print("""
 Normalization Form C
 ----------------------------------------------------------------------
@@ -146,11 +147,6 @@ Normalization Form C
         else:
             lst_2.append(NFC(nfkd))
 
-#        lst_1 = [nfc, NFC(source), NFC(nfc), NFC(nfd)]
-#        lst_2 = [nfkc, NFC(nfkc), NFC(nfkd)]
-#        if (all(x == lst_1[0] for x in lst_1)
-#                and all(x == lst_2[0] for x in lst_2)):
-#            s += 1
         if (all(x == nfc for x in lst_1)
                 and all(x == nfkc for x in lst_2)):
             s += 1
@@ -171,6 +167,7 @@ Normalization Form C
     # NFD
     # c3 ==  toNFD(c1) ==  toNFD(c2) ==  toNFD(c3)
     # c5 ==  toNFD(c4) ==  toNFD(c5)
+
     print("""
 Normalization Form D
 ----------------------------------------------------------------------
@@ -207,11 +204,6 @@ Normalization Form D
         else:
             lst_2.append(NFD(nfkd))
 
-#        lst_1 = [nfd, NFD(source), NFD(nfc), NFD(nfd)]
-#        lst_2 = [nfkd, NFD(nfkc), NFD(nfkd)]
-#        if (all(x == lst_1[0] for x in lst_1)
-#                and all(x == lst_2[0] for x in lst_2)):
-#            s += 1
         if (all(x == nfd for x in lst_1)
                 and all(x == nfkd for x in lst_2)):
             s += 1
@@ -231,6 +223,7 @@ Normalization Form D
 
     # NFKC
     # c4 == toNFKC(c1) == toNFKC(c2) == toNFKC(c3) == toNFKC(c4) == toNFKC(c5)
+
     print("""
 Normalization Form KC
 ----------------------------------------------------------------------
@@ -266,9 +259,6 @@ Normalization Form KC
         else:
             lst.append(NFKC(nfkd))
 
-        #if (NFKC(source) == NFKC(nfc) == NFKC(nfd) == NFKC(nfkc) == NFKC(nfkd)
-        #        == nfkc):
-        #    s += 1
         if all(item == nfkc for item in lst):
             s += 1
         else:
@@ -287,6 +277,7 @@ Normalization Form KC
 
     # NFKD
     # c5 == toNFKD(c1) == toNFKD(c2) == toNFKD(c3) == toNFKD(c4) == toNFKD(c5)
+
     print("""
 Normalization Form KD
 ----------------------------------------------------------------------
@@ -322,9 +313,6 @@ Normalization Form KD
         else:
             lst.append(NFKD(nfkd))
  
-        #if (NFKD(source) == NFKD(nfc) == NFKD(nfd) == NFKD(nfkc) == NFKD(nfkd)
-        #        == nfkd):
-        #    s += 1
         if all(item == nfkd for item in lst):
             s += 1
         else:
@@ -346,14 +334,15 @@ Normalization Form KD
     #
 
     # X == toNFC(X) == toNFD(X) == toNFKC(X) == toNFKD(X)
+
     print("""
 Character by character test, all normalization forms
 ----------------------------------------------------------------------
 """.rstrip())
 
-    # The characters included in the chars list
-    # have already been processed (above)
     items = set(range(0x0, 0x110000)) - set(chars)
+    # Elements included in the dec list
+    # have already been processed (above).
 
     s, f = 0, 0
     for x in items:
@@ -372,8 +361,6 @@ Character by character test, all normalization forms
         if not check_NFKD(c):
             lst.append(NFKD(c))
 
-        #if c == NFC(c) == NFD(c) == NFKC(c) == NFKD(c):
-        #    s += 1
         if all(item == c for item in lst):
             s += 1
         else:
@@ -398,17 +385,6 @@ Character by character test, all normalization forms
               .format(UNICODE_VERSION))
 
     print(".. {:.3f} seconds\n".format(time.perf_counter() - start_time))
-
-#    from pyunormalize.core import _cache_info
-#    _cache_info()
-
-# maxsize=128
-#    C: CacheInfo(hits=27886, misses=32586, maxsize=128, currsize=128)
-#    K: CacheInfo(hits=55371, misses=39971, maxsize=128, currsize=128)
-
-# maxsize=None:
-#    C: CacheInfo(hits=43826, misses=29416, maxsize=None, currsize=29416)
-#    K: CacheInfo(hits=62251, misses=33091, maxsize=None, currsize=33091)
 
 
 if __name__ == "__main__":

@@ -16,19 +16,29 @@ CEXL = "CompositionExclusions.txt"
 
 
 def _url(url):
+
+    def _excepthook(type, value, traceback):
+        print(value)
+
     try:
-        print("\nFetching URL...")
+        print("\n.. Fetching URL...")
         with urllib.request.urlopen(url) as f:
-            print("Extracting data...", end=" ")
+            print(".. Extracting data...", end=" ")
             return f.read().decode("utf-8").splitlines()
+
     except urllib.error.HTTPError as e:
-        sys.exit(
-            "The server couldn't fulfill the request.\n"
-            "Error code: {}\n".format(e.code))
+        sys.excepthook = _excepthook
+        raise Exception(
+            "{0} The server couldn't fulfill the request.\n"
+            "{0} Error code:\n\n{1}\n"
+            .format("..", e.code))
+
     except urllib.error.URLError as e:
-        sys.exit(
-            "We failed to reach a server.\n"
-            "Reason: {}\n".format(e.reason))
+        sys.excepthook = _excepthook
+        raise Exception(
+            "{0} We failed to reach a server.\n"
+            "{0} Reason:\n\n{1}\n"
+            .format("..", e.reason))
 
 
 def main():

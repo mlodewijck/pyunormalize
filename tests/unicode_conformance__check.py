@@ -73,6 +73,34 @@ def parse(lines):
         _dict[k] = set(v)
 
 
+def _url(url):
+    def _excepthook(type, value, traceback):
+        print(value)
+
+    try:
+        print("\n.. Fetching URL...")
+        response = urllib.request.urlopen(url)
+        #print(response.__dict__)
+
+    except urllib.error.HTTPError as e:
+        sys.excepthook = _excepthook
+        raise Exception(
+            "{0} The server couldn't fulfill the request.\n"
+            "{0} Error code:\n\n{1}\n"
+            .format("..", e.code))
+
+    except urllib.error.URLError as e:
+        sys.excepthook = _excepthook
+        raise Exception(
+            "{0} We failed to reach a server.\n"
+            "{0} Reason:\n\n{1}\n"
+            .format("..", e.reason))
+
+    print(".. Extracting data...")
+
+    return response.read().decode("utf-8").splitlines()
+
+
 def main():
     path_ = os.path.join(DIR_PATH, UNICODE_FILE)
     if os.path.exists(path_):
@@ -80,29 +108,7 @@ def main():
         with open(path_, "r", encoding="utf-8") as fh:
             lines = fh.read().splitlines()
     else:
-        def _excepthook(type, value, traceback):
-            print(value)
-
-        try:
-            print("\n.. Fetching URL...")
-            response = urllib.request.urlopen(URL)
-            #print(response.__dict__)
-        except urllib.error.HTTPError as e:
-            sys.excepthook = _excepthook
-            raise Exception(
-                "{0} The server couldn't fulfill the request.\n"
-                "{0} Error code:\n\n{1}\n"
-                .format("..", e.code))
-        except urllib.error.URLError as e:
-            sys.excepthook = _excepthook
-            raise Exception(
-                "{0} We failed to reach a server.\n"
-                "{0} Reason:\n\n{1}\n"
-                .format("..", e.reason))
-
-        print(".. Extracting data...")
-
-        lines = response.read().decode("utf-8").splitlines()
+        lines = _url(URL)
 
     parse(lines)
 
