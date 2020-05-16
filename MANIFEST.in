@@ -1,0 +1,7 @@
+include LICENSE
+include UNICODE-COPYRIGHT
+include README.md
+recursive-exclude * tools
+recursive-include * *.py
+recursive-exclude * __pycache__
+recursive-exclude * *.pyc
