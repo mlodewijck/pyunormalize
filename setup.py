@@ -15,7 +15,10 @@ setup(
 #    description="Efficient pure Python Unicode normalization.",
 #    description="Unicode normalization forms.",
     description=(
-        "Unicode Normalization Forms. Unicode {} support."
+#        "Unicode Normalization Forms. Unicode {} support."
+        "A Python implementation of the Unicode Normalization Algorithm "
+        "independent from the Python core Unicode database. Unicode {} "
+        "support."
         .format(UNICODE_VERSION[:-2])
     ),
     long_description=long_description,
