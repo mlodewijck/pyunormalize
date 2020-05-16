@@ -12,7 +12,7 @@ UCD_VERSION = UNICODE_VERSION
 
 # Files from UCD
 DATA = "UnicodeData.txt"
-CEXL = "CompositionExclusions.txt"
+EXCL = "CompositionExclusions.txt"
 
 
 def _url(url):
@@ -86,18 +86,18 @@ def main():
     ## Unicode file: CompositionExclusions.txt
     ##
 
-    path = os.path.join(dir_path, CEXL)
+    path = os.path.join(dir_path, EXCL)
     if os.path.exists(path):
         with open(path, "r", encoding="utf-8") as f:
             lines = f.read().splitlines()
     else:
-        url = here + CEXL
+        url = here + EXCL
         lines = _url(url)
         print("Done.")
 
     # Check file version
     assert re.match(
-        "^#.*{}-(.+).txt.*$".format(CEXL[:-4]), lines[0]
+        "^#.*{}-(.+).txt.*$".format(EXCL[:-4]), lines[0]
     ).group(1) == UCD_VERSION
 
     excl = []
