@@ -17,8 +17,8 @@ setup(
     description=(
 #        "Unicode Normalization Forms. Unicode {} support."
         "A Python implementation of the Unicode Normalization Algorithm "
-        "independent from the Python core Unicode database. Unicode {} "
-        "support."
+        "independent from the Python core Unicode database. This library "
+        "supports Unicode {}."
         .format(UNICODE_VERSION[:-2])
     ),
     long_description=long_description,
