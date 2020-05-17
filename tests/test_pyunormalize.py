@@ -25,23 +25,39 @@ class TestSuite(unittest.TestCase):
     def test_UNICODE_VERSION(self):
         self.assertTrue(_UNICODE_VERSION == UNICODE_VERSION)
 
+    def test_check_NFC(self):
+
+        s = "\u1E9B\u0323"
+        self.assertIsNone(check_NFC(s))  # MAYBE -> None
+
+        s = "\u017F\u0307\u0323"
+        self.assertFalse(check_NFC(s))  # NO -> False
+ 
+    def test_check_NFKC(self):
+
+        s = "\u1E9B\u0323"
+        self.assertFalse(check_NFKC(s))  # NO -> False
+
+        s = "\u017F\u0307\u0323"
+        self.assertFalse(check_NFKC(s))  # NO -> False
+
     def test_check(self):
 
-        x = "\u00E9"  # é
-        self.assertTrue(check("NFC", x) == check_NFC(x))  # YES
-        self.assertTrue(check("NFD", x) == check_NFD(x))  # NO
-        self.assertTrue(check("NFKC", x) == check_NFKC(x))  # YES
-        self.assertTrue(check("NFKD", x) == check_NFKD(x))  # NO
+        s = "\u00E9"  # é
+        self.assertTrue(check("NFC", s) == check_NFC(s))  # YES
+        self.assertTrue(check("NFD", s) == check_NFD(s))  # NO
+        self.assertTrue(check("NFKC", s) == check_NFKC(s))  # YES
+        self.assertTrue(check("NFKD", s) == check_NFKD(s))  # NO
 
-        x = "\u0065\u0301"  # é
-        self.assertTrue(check("NFC", x) == check_NFC(x))  # NO
-        self.assertTrue(check("NFD", x) == check_NFD(x))  # YES
-        self.assertTrue(check("NFKC", x) == check_NFKC(x))  # NO
-        self.assertTrue(check("NFKD", x) == check_NFKD(x))  # YES
+        s = "\u0065\u0301"  # é
+        self.assertTrue(check("NFC", s) == check_NFC(s))  # NO
+        self.assertTrue(check("NFD", s) == check_NFD(s))  # YES
+        self.assertTrue(check("NFKC", s) == check_NFKC(s))  # NO
+        self.assertTrue(check("NFKD", s) == check_NFKD(s))  # YES
 
-        x = "\u0300"
-        self.assertTrue(check("NFC", x) == check_NFC(x))  # MAYBE
-        self.assertTrue(check("NFKC", x) == check_NFKC(x))  # MAYBE
+        s = "\u0300"
+        self.assertTrue(check("NFC", s) == check_NFC(s))  # MAYBE
+        self.assertTrue(check("NFKC", s) == check_NFKC(s))  # MAYBE
 
     def test_normalize(self):
 
@@ -51,11 +67,11 @@ class TestSuite(unittest.TestCase):
         #   ϔ   U+03D4 GREEK UPSILON WITH DIAERESIS AND HOOK SYMBOL
         #   ẛ   U+1E9B LATIN SMALL LETTER LONG S WITH DOT ABOVE
 
-        for x in ["\u03D3", "\u03D4", "\u1E9B"]:
-            self.assertTrue(normalize("NFC", x) ==  NFC(x))
-            self.assertTrue(normalize("NFD", x) ==  NFD(x))
-            self.assertTrue(normalize("NFKC", x) == NFKC(x))
-            self.assertTrue(normalize("NFKD", x) == NFKD(x))
+        for s in ["\u03D3", "\u03D4", "\u1E9B"]:
+            self.assertTrue(normalize("NFC", s) ==  NFC(s))
+            self.assertTrue(normalize("NFD", s) ==  NFD(s))
+            self.assertTrue(normalize("NFKC", s) == NFKC(s))
+            self.assertTrue(normalize("NFKD", s) == NFKD(s))
 
     def test_internals(self):
 

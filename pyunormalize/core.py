@@ -59,20 +59,21 @@ def check_NFC(unistr):
     >>> print(check_NFC(s))
     None
     """
+    maybe = False
     curr_ccc, prev_ccc = 0, 0
     for u in unistr:
         u = ord(u)
-        if u in comp_with_prev:
-            return None  # MAYBE
-        if u in full_comp_excl:
-            return False
         if u in ccc:
             curr_ccc = ccc[u]
             if curr_ccc < prev_ccc:
                 return False
+        if u in comp_with_prev:
+            maybe = True
+        if u in full_comp_excl:
+            return False
         prev_ccc, curr_ccc = curr_ccc, 0
 
-    return True
+    return None if maybe else True
 
 
 def check_NFD(unistr):
@@ -103,26 +104,38 @@ def check_NFD(unistr):
     return True
 
 
+def _nfkc_no(cp):
+    if cp in full_comp_excl:
+        return True
+    if cp not in kdecomp or _SFIRST <= cp <= _SLAST:
+        return False
+    if cp not in cdecomp:
+        return True
+
+    return cdecomp[cp] != kdecomp[cp]
+
+
 def check_NFKC(unistr):
     """Quick check for Normalization Form KC. Quickly determine whether
     the Unicode string `unistr` is in NFKC. The result is either True,
     False, or None. For True or False, the answer is definite; in the
     None case, the check was inconclusive (maybe yes, maybe no).
     """
+    maybe = False
     curr_ccc, prev_ccc = 0, 0
     for u in unistr:
         u = ord(u)
-        if u in comp_with_prev:
-            return None  # MAYBE
-        if _nfkc_no(u):
-            return False
         if u in ccc:
             curr_ccc = ccc[u]
             if curr_ccc < prev_ccc:
                 return False
+        if u in comp_with_prev:
+            maybe = True
+        if _nfkc_no(u):
+            return False
         prev_ccc, curr_ccc = curr_ccc, 0
 
-    return True
+    return None if maybe else True
 
 
 def check_NFKD(unistr):
@@ -274,8 +287,6 @@ def NFKD(unistr):
     >>> from pyunormalize import NFKD
     >>> NFKD("ⓕ")
     'f'
-    >>> NFKD("ẛ̣")
-    'ṩ'
     >>> s = "パピプペポ"
     >>> len(s)
     5
@@ -297,22 +308,23 @@ def normalize(form, unistr):
     normalization form `form`. Valid values for `form` are "NFC",
     "NFD", "NFKC", and "NFKD".
 
-    Example:
+    Examples:
 
     >>> from pyunormalize import normalize
-    >>> forms = ["NFC", "NFD", "NFKC", "NFKD"]
+    >>> normalize("NFKC", "ﬃ")
+    'ffi'
     >>> s = "\u1E9B\u0323"
-    >>> [normalize(f, s) for f in forms]
-    ['ẛ̣', 'ẛ̣', 'ṩ', 'ṩ']
-    >>> 
+    >>> forms = ["NFC", "NFD", "NFKC", "NFKD"]
+    >>> frmt = "{:04X}".format
     >>> for f in forms:
     ...     normalized = normalize(f, s)
-    ...     f, [hex(ord(x)) for x in normalized]
+    ...     tmp = " ".join([frmt(ord(x)) for x in normalized])
+    ...     "{:<4} : {}".format(f, tmp)
     ...
-    ('NFC', ['0x1e9b', '0x323'])
-    ('NFD', ['0x17f', '0x323', '0x307'])
-    ('NFKC', ['0x1e69'])
-    ('NFKD', ['0x73', '0x323', '0x307'])
+    'NFC  : 1E9B 0323'
+    'NFD  : 017F 0323 0307'
+    'NFKC : 1E69'
+    'NFKD : 0073 0323 0307'
     """
     return _nfunc[form](unistr)
 
@@ -454,17 +466,6 @@ def _compose_jamo_characters(pair):
         return x + y - _TSTART
 
     return None
-
-
-def _nfkc_no(cp):
-    if cp in full_comp_excl:
-        return True
-    if cp not in kdecomp or _SFIRST <= cp <= _SLAST:
-        return False
-    if cp not in cdecomp:
-        return True
-
-    return cdecomp[cp] != kdecomp[cp]
 
 
 if __name__ == "__main__":
