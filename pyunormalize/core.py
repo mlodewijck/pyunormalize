@@ -185,7 +185,7 @@ def NFC(unistr):
     replaced by canonically equivalent composites, where possible;
     compatibility characters are unaffected.
 
-    Example:
+    Examples:
 
     >>> from pyunormalize import NFC
     >>> s = "".join(['ᄒ', 'ᅡ', 'ᆫ', 'ᄀ', 'ᅮ', 'ᆨ'])
@@ -196,7 +196,7 @@ def NFC(unistr):
     2
     >>> [*nfc]
     ['한', '국']
-    >>>
+    >>> 
     >>> NFC("ﬃ")
     'ﬃ'
     """
@@ -213,7 +213,7 @@ def NFD(unistr):
     sequences, in canonical order; compatibility characters are
     unaffected.
 
-    Example:
+    Examples:
 
     >>> from pyunormalize import NFD
     >>> s = "한국"
@@ -240,7 +240,7 @@ def NFKC(unistr):
     possible; compatibility characters are replaced by their nominal
     counterparts.
 
-    Example:
+    Examples:
 
     >>> from pyunormalize import NFKC
     >>> NFKC("ﬃ")
@@ -261,7 +261,7 @@ def NFKD(unistr):
     sequences, in canonical order; compatibility characters are
     replaced by their nominal counterparts.
 
-    Example:
+    Examples:
 
     >>> from pyunormalize import NFKD
     >>> NFKD("ⓕ")
@@ -289,7 +289,7 @@ def normalize(form, unistr):
     >>> from pyunormalize import normalize
     >>> forms = ["NFC", "NFD", "NFKC", "NFKD"]
     >>> unistr = "\u017F\u0307\u0323"
-    >>> print([normalize(f, unistr) for f in forms])
+    >>> [normalize(f, unistr) for f in forms]
     ['ẛ̣', 'ẛ̣', 'ṩ', 'ṩ']
     """
     return _nfunc[form](unistr)
@@ -445,6 +445,6 @@ def _nfkc_no(cp):
     return cdecomp[cp] != kdecomp[cp]
 
 
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
+#if __name__ == "__main__":
+#    import doctest
+#    doctest.testmod()
