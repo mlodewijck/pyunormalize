@@ -171,7 +171,7 @@ def NFC(unistr):
     Example:
 
     >>> from pyunormalize import NFC
-    >>> unistr = "한국"
+    >>> unistr = "".join(['ᄒ', 'ᅡ', 'ᆫ', 'ᄀ', 'ᅮ', 'ᆨ'])
     >>> nfc = NFC(unistr)
     >>> print(nfc)
     한국
