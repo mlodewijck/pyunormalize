@@ -202,8 +202,8 @@ def NFD(unistr):
     한국
     >>> print([*nfd])
     ['ᄒ', 'ᅡ', 'ᆫ', 'ᄀ', 'ᅮ', 'ᆨ']
-    >>> print(NFD("⑴"))
-    ⑴
+    >>> print(NFD("ⓕ"))
+    ⓕ
     """
     res = _reorder(_decompose(unistr))
     return "".join(map(chr, res))
@@ -239,6 +239,8 @@ def NFKD(unistr):
     Example:
 
     >>> from pyunormalize import NFKD
+    >>> print(NFKD("ⓕ"))
+    f
     >>> print(NFKD("ẛ̣"))
     ṩ
     """
