@@ -171,8 +171,12 @@ def NFC(unistr):
     Example:
 
     >>> from pyunormalize import NFC
-    >>> print(NFC("한국"))
+    >>> unistr = "한국"
+    >>> nfc = NFC(unistr)
+    >>> print(nfc)
     한국
+    >>> print([*nfc])
+    ['한', '국']
     >>> print(NFC("ﬃ"))
     ﬃ
     """
@@ -192,8 +196,12 @@ def NFD(unistr):
     Example:
 
     >>> from pyunormalize import NFD
-    >>> print(NFD("한국"))
+    >>> unistr = "한국"
+    >>> nfd = NFD(unistr)
+    >>> print(nfd)
     한국
+    >>> print([*nfd])
+    ['ᄒ', 'ᅡ', 'ᆫ', 'ᄀ', 'ᅮ', 'ᆨ']
     >>> print(NFD("⑴"))
     ⑴
     """
@@ -231,8 +239,8 @@ def NFKD(unistr):
     Example:
 
     >>> from pyunormalize import NFKD
-    >>> print(NFKD("⑴"))
-    (1)
+    >>> print(NFKD("ẛ̣"))
+    ṩ
     """
     res = _reorder(_decompose(unistr, compat=True))
     return "".join(map(chr, res))
