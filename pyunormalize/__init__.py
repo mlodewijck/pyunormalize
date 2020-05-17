@@ -15,15 +15,9 @@ Quick verification check:
         check_NFC, check_NFD, check_NFKC, check_NFKD
     )
 
-    print(check_NFC("élève"))  # True
-    print(check_NFD("élève"))  # False
-
-    s = "a\u0302\u0301\u0328"  # ą̂́
-    print(check_NFC(s))  # False
-    print(check_NFD(s))  # False
-    print(NFC(s))  # \u0105\u0302\u0301     ą̂́
-    print(NFD(s))  # \u0061\u0328\u0302\u0301    ą̂́
-
+    unistr = ą̂́  # \u0061\u0302\u0301\u0328"
+    print(NFC(unistr))  # ą̂́ (\u0105\u0302\u0301)
+    print(NFD(unistr))  # ą̂́ (\u0061\u0328\u0302\u0301)
 
     unistr = "\u017F\u0307\u0323"
     print(check_NFC(unistr))   # None
@@ -78,7 +72,7 @@ Normalization:
     # ['ẛ̣', 'ẛ̣', 'ṩ', 'ṩ']
 
 
-To get the version of the Unicode Character Database currently used:
+The version of the Unicode Character Database used in this package:
 
     import pyunormalize
     print(pyunormalize.UCD_VERSION)
