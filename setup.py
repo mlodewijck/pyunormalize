@@ -10,15 +10,9 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setup(
     name="pyunormalize",
     version=__version__,
-#    description="Normalization of Unicode text: Pure Python ...",
-#    description="Convert Unicode strings to one of the Unicode Normalization Forms.",
-#    description="Efficient pure Python Unicode normalization.",
-#    description="Unicode normalization forms.",
     description=(
-#        "Unicode Normalization Forms. Unicode {} support."
-        "A Python implementation of the Unicode Normalization Algorithm "
-        "independent from the Python core Unicode database. This library "
-        "supports Unicode {}."
+        "Unicode normalization forms. A library independent from the Python "
+        "core Unicode database. Support of Unicode {}."
         .format(UNICODE_VERSION[:-2])
     ),
     long_description=long_description,
@@ -26,8 +20,6 @@ setup(
     url=URL,
     author="Marc Lodewijck",
     author_email="mlodewijck@gmail.com",
-    maintainer="Marc Lodewijck",
-    maintainer_email="mlodewijck@gmail.com",
     license="MIT",
     classifiers=[
         "Intended Audience :: Developers",
@@ -67,7 +59,7 @@ setup(
     ],
     python_requires=">=3.5",
     packages=find_packages(exclude=["tests", "tools"]),
-    include_package_data=True,  # checks MANIFEST.in for explicit rules
+    include_package_data=True,
     zip_safe=False,
     project_urls={
         "Bug Reports": "{}/issues".format(URL),
