@@ -47,7 +47,6 @@ setup(
         "NFKC",
         "NFKD",
         "Unicode Normalization Forms",
-        "Unicode Normalization Algorithm",
         "Canonical Ordering Algorithm",
         "Canonical Composition Algorithm",
         "Hangul Syllable Composition Algorithm",
