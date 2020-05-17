@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
-"""A pure Python implementation of the Unicode Normalization Algorithm
-independent from the Python core Unicode database.
+"""Unicode normalization forms. A library independent from the Python
+core Unicode database.
 
 For the formal specification of the Unicode Normalization Algorithm,
 see Section 3.11, Normalization Forms, in the Unicode core
-specification.
-
-Unicode Standard Annex #15, "Unicode Normalization Forms", contains more
-detailed explanations, examples, and implementation strategies.
-
+specification. Unicode Standard Annex #15, "Unicode Normalization
+Forms", contains more detailed explanations, examples, and
+implementation strategies.
 
 To get the version of the Unicode Character Database currently used:
 
@@ -26,6 +24,10 @@ Quick verification check:
     from pyunormalize import (
         check_NFC, check_NFD, check_NFKC, check_NFKD
     )
+
+    print(check_NFC("élève"))  # True
+    print(check_NFD("élève"))  # False
+
     unistr = "\u017F\u0307\u0323"
     print(check_NFC(unistr))   # None
     print(check_NFD(unistr))   # False
@@ -40,16 +42,25 @@ Quick verification check:
     print([check(f, unistr) for f in forms])
     # [None, False, False, False]
 
-    unistr = "한국"
+    unistr = "한국"  # "\u1112\u1161\u11AB\u1100\u116E\u11A8"
     print(check("NFC", unistr))  # None
     print(check("NFD", unistr))  # True
 
-    unistr = "한국"
+    unistr = "한국"  # "\uD55C\uAD6D"
     print(check("NFC", unistr))  # True
     print(check("NFD", unistr))  # False
 
 
 Normalization:
+
+    from pyunormalize import NFC, NFD
+
+    unistr = "한국"  # "\u1112\u1161\u11AB\u1100\u116E\u11A8"
+    print(NFC(unistr))  # 한국
+
+    unistr = "한국"  # "\uD55C\uAD6D"
+    print(NFD(unistr))  # 한국
+
 
     from pyunormalize import NFC, NFD, NFKC, NFKD
     unistr = "\u017F\u0307\u0323"
@@ -57,6 +68,7 @@ Normalization:
     nfd = NFD(unistr)    # ẛ̣
     nfkc = NFKC(unistr)  # ṩ
     nfkd = NFKD(unistr)  # ṩ
+
 
     from pyunormalize import normalize
     unistr = "\u017F\u0307\u0323"
