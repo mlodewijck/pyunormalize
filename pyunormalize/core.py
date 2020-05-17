@@ -194,8 +194,8 @@ def NFD(unistr):
     >>> from pyunormalize import NFD
     >>> print(NFD("한국"))
     한국
-    >>> print(NFD("ﬃ"))
-    ﬃ
+    >>> print(NFD("⑴"))
+    ⑴
     """
     res = _reorder(_decompose(unistr))
     return "".join(map(chr, res))
@@ -407,6 +407,6 @@ def _nfkc_no(cp):
     return cdecomp[cp] != kdecomp[cp]
 
 
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
+#if __name__ == "__main__":
+#    import doctest
+#    doctest.testmod()
