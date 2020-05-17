@@ -245,8 +245,16 @@ def NFKC(unistr):
     >>> from pyunormalize import NFKC
     >>> NFKC("ﬃ")
     'ffi'
-    >>> len(NFKC("パピプペポ"))
+    >>> s = "".join(['ハ', '゚', 'ヒ', '゚', 'フ', '゚', 'ヘ', '゚', 'ホ', '゚'])
+    >>> s
+    'パピプペポ'
+    >>> len(s)
+    10
+    >>> nfkc = NFKC(s)
+    >>> len(nfkc)
     5
+    >>> [*nfkc]
+    ['パ', 'ピ', 'プ', 'ペ', 'ポ']
     """
     res = _compose([ord(u) for u in NFKD(unistr)])
     return "".join(map(chr, res))
@@ -269,8 +277,13 @@ def NFKD(unistr):
     >>> NFKD("ẛ̣")
     'ṩ'
     >>> s = "パピプペポ"
-    >>> len(NFKD(s))
+    >>> len(s)
+    5
+    >>> nfkd = NFKD(s)
+    >>> len(nfkd)
     10
+    >>> [*nfkd]
+    ['ハ', '゚', 'ヒ', '゚', 'フ', '゚', 'ヘ', '゚', 'ホ', '゚']
     """
     res = _reorder(_decompose(unistr, compat=True))
     return "".join(map(chr, res))
