@@ -29,20 +29,19 @@ _TFIRST, _TLAST = 0x11A8, 0x11C2  # trailing consonants (syllable codas)
 cdecomp = {}  # canonical decompositions
 kdecomp = {}  # compatibility decompositions
 precomp_chars = {}  # precomposed characters (canonical composites)
-COMP_EXCL_ADD = []  # non-starter and singleton decompositions
+comp_excl_add = []  # non-starter and singleton decompositions
 
 comp_with_prev = set([  # may compose with a previous character
     *range(_VFIRST, _VLAST + 1),
     *range(_TFIRST, _TLAST + 1)
 ])
 
-for key in decomp:
-    val = decomp[key]
+for key, val in decomp.items():
     if isinstance(val[0], int):
         #assert len(val) in (1, 2)  # checked
         cdecomp[key] = kdecomp[key] = val
         if len(val) == 1 or val[0] in ccc:  # singleton or non-starter
-            COMP_EXCL_ADD.append(key)
+            comp_excl_add.append(key)
         else:
             precomp_chars[tuple(val)] = key
             if key not in comp_excl:
@@ -51,7 +50,7 @@ for key in decomp:
         kdecomp[key] = val[1:]
 
 # Full composition exclusions
-full_comp_excl = comp_excl | set(COMP_EXCL_ADD)
+full_comp_excl = comp_excl | set(comp_excl_add)
 
 
 def _full_decomposition(decomp_dict):

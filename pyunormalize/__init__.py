@@ -8,16 +8,6 @@ specification. Unicode Standard Annex #15, "Unicode Normalization
 Forms", contains more detailed explanations, examples, and
 implementation strategies.
 
-To get the version of the Unicode Character Database currently used:
-
-    import pyunormalize
-    print(pyunormalize.UCD_VERSION)
-
-    Or:
-
-    from pyunormalize import UCD_VERSION
-    print(UCD_VERSION)
-
 
 Quick verification check:
 
@@ -27,6 +17,13 @@ Quick verification check:
 
     print(check_NFC("élève"))  # True
     print(check_NFD("élève"))  # False
+
+    s = "a\u0302\u0301\u0328"  # ą̂́
+    print(check_NFC(s))  # False
+    print(check_NFD(s))  # False
+    print(NFC(s))  # \u0105\u0302\u0301     ą̂́
+    print(NFD(s))  # \u0061\u0328\u0302\u0301    ą̂́
+
 
     unistr = "\u017F\u0307\u0323"
     print(check_NFC(unistr))   # None
@@ -61,6 +58,10 @@ Normalization:
     unistr = "한국"  # "\uD55C\uAD6D"
     print(NFD(unistr))  # 한국
 
+    unistr = "a\u0302\u0301\u0328"  # ą̂́
+    print(NFC(unistr))  # \u0105\u0302\u0301
+    print(NFD(unistr))  # \u0061\u0328\u0302\u0301
+
 
     from pyunormalize import NFC, NFD, NFKC, NFKD
     unistr = "\u017F\u0307\u0323"
@@ -75,6 +76,17 @@ Normalization:
     forms = ["NFC", "NFD", "NFKC", "NFKD"]
     print([normalize(f, unistr) for f in forms])
     # ['ẛ̣', 'ẛ̣', 'ṩ', 'ṩ']
+
+
+To get the version of the Unicode Character Database currently used:
+
+    import pyunormalize
+    print(pyunormalize.UCD_VERSION)
+
+    Or:
+
+    from pyunormalize import UCD_VERSION
+    print(UCD_VERSION)
 
 """
 
