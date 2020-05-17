@@ -86,7 +86,7 @@ def check_NFD(unistr):
     >>> from pyunormalize import check_NFD
     >>> check_NFD("한국")
     False
-    >>> s = "".join(['ᄒ', 'ᅡ', 'ᆫ', 'ᄀ', 'ᅮ', 'ᆨ'])
+    >>> s = "".join(["ᄒ", "ᅡ", "ᆫ", "ᄀ", "ᅮ", "ᆨ"])
     >>> check_NFD(s)
     True
     """
@@ -201,7 +201,7 @@ def NFC(unistr):
     Examples:
 
     >>> from pyunormalize import NFC
-    >>> s = "".join(['ᄒ', 'ᅡ', 'ᆫ', 'ᄀ', 'ᅮ', 'ᆨ'])
+    >>> s = "".join(["ᄒ", "ᅡ", "ᆫ", "ᄀ", "ᅮ", "ᆨ"])
     >>> nfc = NFC(s)
     >>> nfc
     '한국'
@@ -258,7 +258,7 @@ def NFKC(unistr):
     >>> from pyunormalize import NFKC
     >>> NFKC("ﬃ")
     'ffi'
-    >>> s = "".join(['ハ', '゚', 'ヒ', '゚', 'フ', '゚', 'ヘ', '゚', 'ホ', '゚'])
+    >>> s = "".join(["ハ", "゚", "ヒ", "゚", "フ", "゚", "ヘ", "゚", "ホ", "゚"])
     >>> s
     'パピプペポ'
     >>> len(s)
