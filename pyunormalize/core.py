@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """pyunormalize.core"""
 
+from functools import lru_cache
+
 from pyunormalize import data
 
 # Full canonical decomposition mappings [dict]
@@ -174,10 +176,11 @@ def NFC(unistr):
     >>> print(NFC("ﬃ"))
     ﬃ
     """
-    res = _compose(_reorder(_decompose(unistr)))
+    res = _compose([ord(u) for u in NFD(unistr)])
     return "".join(map(chr, res))
 
 
+@lru_cache()
 def NFD(unistr):
     """Return the canonical equivalent "decomposed" form of the
     original Unicode string `unistr`. That is, transform the Unicode
@@ -212,10 +215,11 @@ def NFKC(unistr):
     >>> print(NFKC("ﬃ"))
     ffi
     """
-    res = _compose(_reorder(_decompose(unistr, compat=True)))
+    res = _compose([ord(u) for u in NFKD(unistr)])
     return "".join(map(chr, res))
 
 
+@lru_cache()
 def NFKD(unistr):
     """Return the compatibility equivalent "decomposed" form of the
     original Unicode string `unistr`. That is, transform the Unicode
