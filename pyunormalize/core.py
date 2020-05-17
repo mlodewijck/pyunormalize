@@ -45,18 +45,31 @@ def check_NFC(unistr):
     the Unicode string `unistr` is in NFC. The result is either True,
     False, or None. For True or False, the answer is definite; in the
     None case, the check was inconclusive (maybe yes, maybe no).
+
+    Examples:
+
+    >>> from pyunormalize import check_NFC
+    >>> check_NFC("한국")
+    True
+    >>> s = "e\u0340"
+    >>> check_NFC(s)
+    False
+    >>> s = "e\u0300"
+    >>> check_NFC(s)
+    >>> print(check_NFC(s))
+    None
     """
     curr_ccc, prev_ccc = 0, 0
     for u in unistr:
         u = ord(u)
-        if u in ccc:
-            curr_ccc = ccc[u]
-            if curr_ccc < prev_ccc:
-                return False
         if u in comp_with_prev:
             return None  # MAYBE
         if u in full_comp_excl:
             return False
+        if u in ccc:
+            curr_ccc = ccc[u]
+            if curr_ccc < prev_ccc:
+                return False
         prev_ccc, curr_ccc = curr_ccc, 0
 
     return True
@@ -66,6 +79,15 @@ def check_NFD(unistr):
     """Quick check for Normalization Form D. Quickly determine whether
     the Unicode string `unistr` is in NFD. The result is either True or
     False.
+
+    Examples:
+
+    >>> from pyunormalize import check_NFD
+    >>> check_NFD("한국")
+    False
+    >>> s = "".join(['ᄒ', 'ᅡ', 'ᆫ', 'ᄀ', 'ᅮ', 'ᆨ'])
+    >>> check_NFD(s)
+    True
     """
     curr_ccc, prev_ccc = 0, 0
     for u in unistr:
@@ -90,14 +112,14 @@ def check_NFKC(unistr):
     curr_ccc, prev_ccc = 0, 0
     for u in unistr:
         u = ord(u)
-        if u in ccc:
-            curr_ccc = ccc[u]
-            if curr_ccc < prev_ccc:
-                return False
         if u in comp_with_prev:
             return None  # MAYBE
         if _nfkc_no(u):
             return False
+        if u in ccc:
+            curr_ccc = ccc[u]
+            if curr_ccc < prev_ccc:
+                return False
         prev_ccc, curr_ccc = curr_ccc, 0
 
     return True
@@ -139,20 +161,15 @@ def check(form, unistr):
     Examples:
 
     >>> from pyunormalize import check
-    >>> s = "한국"
-    >>> print(check("NFC", s))
-    None
-    >>> print(check("NFD", s))
-    True
     >>> s = "한국"
-    >>> print(check("NFC", s))
+    >>> check("NFC", s)
     True
-    >>> print(check("NFD", s))
+    >>> check("NFD", s)
     False
-
+    >>> 
     >>> forms = ["NFC", "NFD", "NFKC", "NFKD"]
-    >>> unistr = "\u017F\u0307\u0323"
-    >>> print([check(f, unistr) for f in forms])
+    >>> s = "\u017F\u0307\u0323"
+    >>> [check(f, s) for f in forms]
     [None, False, False, False]
     """
     return _cfunc[form](unistr)
@@ -171,14 +188,17 @@ def NFC(unistr):
     Example:
 
     >>> from pyunormalize import NFC
-    >>> unistr = "".join(['ᄒ', 'ᅡ', 'ᆫ', 'ᄀ', 'ᅮ', 'ᆨ'])
-    >>> nfc = NFC(unistr)
-    >>> print(nfc)
-    한국
-    >>> print([*nfc])
+    >>> s = "".join(['ᄒ', 'ᅡ', 'ᆫ', 'ᄀ', 'ᅮ', 'ᆨ'])
+    >>> nfc = NFC(s)
+    >>> nfc
+    '한국'
+    >>> len(nfc)
+    2
+    >>> [*nfc]
     ['한', '국']
-    >>> print(NFC("ﬃ"))
-    ﬃ
+    >>>
+    >>> NFC("ﬃ")
+    'ﬃ'
     """
     res = _compose([ord(u) for u in NFD(unistr)])
     return "".join(map(chr, res))
@@ -196,14 +216,17 @@ def NFD(unistr):
     Example:
 
     >>> from pyunormalize import NFD
-    >>> unistr = "한국"
-    >>> nfd = NFD(unistr)
-    >>> print(nfd)
-    한국
-    >>> print([*nfd])
+    >>> s = "한국"
+    >>> nfd = NFD(s)
+    >>> nfd
+    '한국'
+    >>> len(nfd)
+    6
+    >>> [*nfd]
     ['ᄒ', 'ᅡ', 'ᆫ', 'ᄀ', 'ᅮ', 'ᆨ']
-    >>> print(NFD("ⓕ"))
-    ⓕ
+    >>>
+    >>> NFD("ⓕ")
+    'ⓕ'
     """
     res = _reorder(_decompose(unistr))
     return "".join(map(chr, res))
@@ -220,8 +243,10 @@ def NFKC(unistr):
     Example:
 
     >>> from pyunormalize import NFKC
-    >>> print(NFKC("ﬃ"))
-    ffi
+    >>> NFKC("ﬃ")
+    'ffi'
+    >>> len(NFKC("パピプペポ"))
+    5
     """
     res = _compose([ord(u) for u in NFKD(unistr)])
     return "".join(map(chr, res))
@@ -239,10 +264,13 @@ def NFKD(unistr):
     Example:
 
     >>> from pyunormalize import NFKD
-    >>> print(NFKD("ⓕ"))
-    f
-    >>> print(NFKD("ẛ̣"))
-    ṩ
+    >>> NFKD("ⓕ")
+    'f'
+    >>> NFKD("ẛ̣")
+    'ṩ'
+    >>> s = "パピプペポ"
+    >>> len(NFKD(s))
+    10
     """
     res = _reorder(_decompose(unistr, compat=True))
     return "".join(map(chr, res))
@@ -417,6 +445,6 @@ def _nfkc_no(cp):
     return cdecomp[cp] != kdecomp[cp]
 
 
-#if __name__ == "__main__":
-#    import doctest
-#    doctest.testmod()
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
