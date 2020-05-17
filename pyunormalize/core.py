@@ -168,7 +168,7 @@ def check(form, unistr):
     False
     >>> 
     >>> forms = ["NFC", "NFD", "NFKC", "NFKD"]
-    >>> s = "\u017F\u0307\u0323"
+    >>> s = "\u1E9B\u0323"
     >>> [check(f, s) for f in forms]
     [None, False, False, False]
     """
@@ -301,9 +301,18 @@ def normalize(form, unistr):
 
     >>> from pyunormalize import normalize
     >>> forms = ["NFC", "NFD", "NFKC", "NFKD"]
-    >>> unistr = "\u017F\u0307\u0323"
-    >>> [normalize(f, unistr) for f in forms]
+    >>> s = "\u1E9B\u0323"
+    >>> [normalize(f, s) for f in forms]
     ['ẛ̣', 'ẛ̣', 'ṩ', 'ṩ']
+    >>> 
+    >>> for f in forms:
+    ...     normalized = normalize(f, s)
+    ...     f, [hex(ord(x)) for x in normalized]
+    ...
+    ('NFC', ['0x1e9b', '0x323'])
+    ('NFD', ['0x17f', '0x323', '0x307'])
+    ('NFKC', ['0x1e69'])
+    ('NFKD', ['0x73', '0x323', '0x307'])
     """
     return _nfunc[form](unistr)
 
@@ -458,6 +467,6 @@ def _nfkc_no(cp):
     return cdecomp[cp] != kdecomp[cp]
 
 
-#if __name__ == "__main__":
-#    import doctest
-#    doctest.testmod()
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
