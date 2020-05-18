@@ -26,7 +26,7 @@ Quick verification check:
     )
 
     unistr = ą̂́  # \u0061\u0302\u0301\u0328
-    print(check_NFC(unistr))  # False
+    print(check_NFC(unistr))  # None
     print(check_NFD(unistr))  # False
 
     unistr = "\u017F\u0307\u0323"
