@@ -11,8 +11,9 @@ setup(
     name="pyunormalize",
     version=__version__,
     description=(
-        "Unicode normalization forms. A library independent from the Python "
-        "core Unicode database. Support of Unicode {}."
+        "Unicode normalization forms ((NFC, NFKC, NFD, NFKD). A library "
+        "independent from the Python core Unicode database. Support of "
+        "Unicode {}."
         .format(UNICODE_VERSION[:-2])
     ),
     long_description=long_description,
@@ -32,16 +33,16 @@ setup(
         "Topic :: Utilities",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3 :: Only",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
     ],
     keywords=[
         "Unicode",
+        "Unicode data",
         "Unicode normalization",
-        "normalization",
-        "normalization quick check",
         "NFC",
         "NFD",
         "NFKC",
@@ -56,7 +57,7 @@ setup(
         "Hangul syllables",
         "Hangul jamo characters",
     ],
-    python_requires=">=3.5",
+    python_requires=">=3.6",
     packages=find_packages(exclude=["tests", "tools"]),
     include_package_data=True,
     zip_safe=False,

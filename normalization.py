@@ -1,0 +1,387 @@
+"""pyunormalize.normalization"""
+
+from pyunormalize.unicode import (
+    _DECOMP,       # character decomposition mappings
+    _CCC,          # non-zero canonical combining class values
+    _COMP_EXCL,    # characters excluded from composition
+    _QC_PROP_VAL,  # characters listed for several Quick_Check property values
+)
+
+# Full canonical decompositions,
+# not including Hangul syllables
+_CDECOMP = {}
+
+# Full compatibility decompositions,
+# not including Hangul syllables
+_KDECOMP = {}
+
+# Precomposed characters (canonical composites),
+# not including Hangul syllables
+_PRECOMP = {}
+
+# NOTE: Because the Hangul compositions and decompositions are algorithmic,
+# the corresponding operations are done in code rather than by storing
+# the data in the general-purpose tables.
+
+
+def _full_decomposition(decomp_dict):
+    # A full decomposition of a character sequence results from decomposing
+    # each of the characters in the sequence until no characters can be further
+    # decomposed.
+
+    for key in decomp_dict:
+        tmp = []
+        decomposition = [key]
+        while True:
+            for x in decomposition:
+                if x in decomp_dict:
+                    tmp.extend(decomp_dict[x])
+                else:
+                    tmp.append(x)
+            if tmp == decomposition:
+                decomp_dict[key] = decomposition  # done
+                break
+            decomposition, tmp = tmp, []
+
+
+def _make_dictionaries():
+    for key, val in _DECOMP.items():
+        if isinstance(val[0], int):
+            # assert len(val) in (1, 2)
+            _CDECOMP[key] = _KDECOMP[key] = val
+            if len(val) == 1 or val[0] in _CCC:  # singleton or non-starter
+                continue
+            _PRECOMP[tuple(val)] = key
+        else:
+            _KDECOMP[key] = val[1:]
+
+    # Make full canonical decomposition
+    _full_decomposition(_CDECOMP)
+
+    # Make full compatibility decomposition
+    _full_decomposition(_KDECOMP)
+
+
+_make_dictionaries()
+
+
+#
+# Public interface
+#
+
+
+# Code points listed for NFD_Quick_Check=No
+_NFD_NO = _QC_PROP_VAL["NFD_QC=N"]
+
+def NFD(unistr):
+    """Return the canonical equivalent "decomposed" form of the
+    original Unicode string *unistr*. That is, transform the Unicode
+    string into the Unicode "normalization form D": composite
+    characters are replaced by canonically equivalent character
+    sequences, in canonical order; compatibility characters are
+    unaffected.
+
+    Example:
+
+    >>> from pyunormalize import NFD
+    >>> NFD("한국")
+    '한국'
+    >>> NFD("ﬃ")
+    'ﬃ'
+    """
+
+    # Quick check for NFD
+    prev_ccc, curr_ccc = 0, 0
+    for u in unistr:
+        u = ord(u)
+        if u in _NFD_NO:  # u in _CDECOMP or 0xAC00 <= u <= 0xD7A3
+            break
+        if u in _CCC:
+            curr_ccc = _CCC[u]
+            if curr_ccc < prev_ccc:
+                break
+        prev_ccc, curr_ccc = curr_ccc, 0
+    else:
+        return unistr  # source string is in NFD
+
+    # Normalize to NFD
+    result = _reorder(_decompose(unistr))
+    return "".join([chr(x) for x in result])
+
+
+# Code points listed for NFC_Quick_Check=No or NFC_Quick_Check=Maybe
+_NFC_NO_OR_MAYBE = _QC_PROP_VAL["NFC_QC=N"] | _QC_PROP_VAL["NFC_QC=M"]
+
+def NFC(unistr):
+    """Return the canonical equivalent "composed" form of the original
+    Unicode string *unistr*. That is, transform the Unicode string into
+    the Unicode "normalization form C": character sequences are
+    replaced by canonically equivalent composites, where possible;
+    compatibility characters are unaffected.
+
+    Example:
+
+    >>> from pyunormalize import NFC
+    >>> NFC("한국")
+    '한국'
+    >>> NFC("ﬃ")
+    'ﬃ'
+    """
+    # Quick check for NFC
+    prev_ccc, curr_ccc = 0, 0
+    for u in unistr:
+        u = ord(u)
+        if u in _NFC_NO_OR_MAYBE:
+            break
+        if u in _CCC:
+            curr_ccc = _CCC[u]
+            if curr_ccc < prev_ccc:
+                break
+        prev_ccc, curr_ccc = curr_ccc, 0
+    else:
+        return unistr  # source string is in NFC
+
+    # Normalize to NFC
+    # result = _compose(_reorder(_decompose(unistr)))
+    result = _compose([ord(u) for u in NFD(unistr)])
+    return "".join([chr(x) for x in result])
+
+
+# Code points listed for NFKD_Quick_Check=No
+_NFKD_NO = _QC_PROP_VAL["NFKD_QC=N"]
+
+def NFKD(unistr):
+    """Return the compatibility equivalent "decomposed" form of the
+    original Unicode string *unistr*. That is, transform the Unicode
+    string into the Unicode "normalization form KD": composite
+    characters are replaced by canonically equivalent character
+    sequences, in canonical order; compatibility characters are
+    replaced by their nominal counterparts.
+
+    Example:
+
+    >>> from pyunormalize import NFKD
+    >>> NFKD("⑴")
+    '(1)'
+    """
+    # Quick check for NFKD
+    prev_ccc, curr_ccc = 0, 0
+    for u in unistr:
+        u = ord(u)
+        if u in _NFKD_NO:  # u in _KDECOMP or 0xAC00 <= u <= 0xD7A3
+            break
+        if u in _CCC:
+            curr_ccc = _CCC[u]
+            if curr_ccc < prev_ccc:
+                break
+        prev_ccc, curr_ccc = curr_ccc, 0
+    else:
+        return unistr  # source string is in NFKD
+
+    # Normalize to NFKD
+    result = _reorder(_decompose(unistr, compatibility=True))
+    return "".join([chr(x) for x in result])
+
+
+# Code points listed for NFKC_Quick_Check=No or NFKC_Quick_Check=Maybe
+_NFKC_NO_OR_MAYBE = _QC_PROP_VAL["NFKC_QC=N"] | _QC_PROP_VAL["NFKC_QC=M"]
+
+def NFKC(unistr):
+    """Return the compatibility equivalent "composed" form of the
+    original Unicode string *unistr*. That is, transform the Unicode
+    string into the Unicode "normalization form KC": character
+    sequences are replaced by canonically equivalent composites, where
+    possible; compatibility characters are replaced by their nominal
+    counterparts.
+
+    Example:
+
+    >>> from pyunormalize import NFKC
+    >>> NFKC("ﬃ")
+    'ffi'
+    """
+    # Quick check for NFKC
+    prev_ccc, curr_ccc = 0, 0
+    for u in unistr:
+        u = ord(u)
+        if u in _NFKC_NO_OR_MAYBE:
+            break
+        if u in _CCC:
+            curr_ccc = _CCC[u]
+            if curr_ccc < prev_ccc:
+                break
+        prev_ccc, curr_ccc = curr_ccc, 0
+    else:
+        return unistr  # source string is in NFKC
+
+    # Normalize to NFKC
+    # result = _compose(_reorder(_decompose(unistr, compatibility=True)))
+    result = _compose([ord(u) for u in NFKD(unistr)])
+    return "".join([chr(x) for x in result])
+
+
+_dispatch = {
+    "NFD"  : NFD,
+    "NFC"  : NFC,
+    "NFKD" : NFKD,
+    "NFKC" : NFKC,
+}
+
+def normalize(form, unistr):
+    """Transform the Unicode string *unistr* into the Unicode
+    normalization form *form*. Valid values for *form* are "NFC",
+    "NFD", "NFKC", and "NFKD".
+
+    Example:
+
+    >>> from pyunormalize import normalize
+    >>> forms = ["NFC", "NFD", "NFKC", "NFKD"]
+    >>> unistr = "\u017F\u0307\u0323"
+    >>> [normalize(f, unistr) for f in forms]
+    ['ẛ̣', 'ẛ̣', 'ṩ', 'ṩ']
+    """
+    return _dispatch[form](unistr)
+
+
+#
+# Internals
+#
+
+
+_SB, _SL = 0xAC00, 0xD7A3  # Hangul syllables for modern Korean
+_LB, _LL = 0x1100, 0x1112  # Hangul leading consonants (syllable onsets)
+_VB, _VL = 0x1161, 0x1175  # Hangul vowels (syllable nucleuses)
+_TB, _TL = 0x11A8, 0x11C2  # Hangul trailing consonants (syllable codas)
+_TS      = 0x11A7          # one less than _TB
+_VC = _VL - _VB + 1        # 21
+_TC = _TL - _TS + 1        # 28
+
+
+def _decompose(unistr, compatibility=None):
+    # Computes the full decomposition of the Unicode string. The type of full
+    # decomposition chosen depends on which Unicode normalization form is
+    # involved. For NFC or NFD, one does a full canonical decomposition. For
+    # NFKC or NFKD, one does a full compatibility decomposition.
+
+    decomp = _KDECOMP if compatibility else _CDECOMP
+    result = []
+    for u in unistr:
+        u = ord(u)
+        if u in decomp:
+            result.extend(decomp[u])
+        elif _SB <= u <= _SL:
+            result.extend(_decompose_hangul_syllable(u))
+        else:
+            result.append(u)
+
+    return result
+
+
+def _decompose_hangul_syllable(s):
+    # Hangul syllable decomposition algorithm. Arithmetically derives the full
+    # canonical decomposition of a precomposed Hangul syllable.
+
+    sidx = s - _SB
+    tidx = sidx % _TC
+    _ = (sidx - tidx) // _TC
+    V = _VB + (_  % _VC)
+    L = _LB + (_ // _VC)
+
+    if tidx:
+        # LVT syllable
+        return (L, V, _TS + tidx)
+
+    # LV syllable
+    return (L, V)
+
+
+def _reorder(items):
+    # Canonical ordering algorithm. Once a string has been fully decomposed,
+    # any sequences of combining marks that it contains are put into a
+    # well-defined order. Only the subset of combining marks which have
+    # non-zero Canonical_Combining_Class property values are subject to
+    # potential reordering by the canonical ordering algorithm. Both the
+    # composed and decomposed normalization forms impose a canonical ordering
+    # on the code point sequence, which is necessary for the normal forms to be
+    # unique.
+
+    for i, j in enumerate(items):
+        if j not in _CCC:  # character is a starter
+            continue
+        idx = i
+        while i < len(items) and items[i] in _CCC:
+            i += 1
+        if i == idx + 1:
+            continue
+        ccc_val = [_CCC[x] for x in items[idx:i]]
+        if ccc_val != sorted(ccc_val):
+            items[idx:i] = (
+                items[x] for _, x in sorted(zip(ccc_val, range(idx, i)))
+            )
+
+    return items
+
+
+def _compose(items):
+    # Canonical composition algorithm. That process transforms the fully
+    # decomposed and canonically ordered string into its most fully composed
+    # but still canonically equivalent sequence.
+
+    for i, x in enumerate(items):
+        if x is None or x in _CCC:
+            continue
+
+        last_cc = False  # _CCC[x] = 0
+        blocked = False
+        for j, y in enumerate(items[i + 1 :], i + 1):
+            if y in _CCC:
+                last_cc = True  # _CCC[y] > 0
+            else:
+                blocked = True
+
+            if blocked and last_cc:
+                continue
+
+            prev = items[j - 1]
+            if prev is None or prev not in _CCC or _CCC[prev] < _CCC[y]:
+                pair = (x, y)  # x: last starter preceding y
+                if pair in _PRECOMP:
+                    precomp = _PRECOMP[pair]
+                else:
+                    precomp = _compose_hangul_syllable(*pair)
+
+                if precomp is None or precomp in _COMP_EXCL:
+                    if blocked:
+                        break
+                else:
+                    items[i] = x = precomp
+                    items[j] = None
+                    if blocked:
+                        blocked = False
+                    else:
+                        last_cc = False
+
+    return [item for item in items if item is not None]
+
+
+def _compose_hangul_syllable(x, y):
+    # Hangul syllable composition algorithm. Arithmetically derives the
+    # mapping of a canonically decomposed sequence of Hangul jamo characters
+    # to an equivalent precomposed Hangul syllable.
+
+    if _LB <= x <= _LL and _VB <= y <= _VL:
+        # Compose a leading consonant and a vowel
+        # into an LV syllable
+        return _SB + (((x - _LB) * _VC) + y - _VB) * _TC
+
+    if _SB <= x <= _SL and not (x - _SB) % _TC and _TB <= y <= _TL:
+        # Compose an LV syllable and a trailing consonant
+        # into an LVT syllable
+        return x + y - _TS
+
+    return None
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
