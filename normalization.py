@@ -84,10 +84,35 @@ def NFD(unistr):
     Example:
 
     >>> from pyunormalize import NFD
-    >>> NFD("한국")
-    '한국'
-    >>> NFD("ﬃ")
-    'ﬃ'
+    >>> 
+    >>> unistr = "élève"
+    >>> nfd = NFD(unistr)
+    >>> unistr, nfd
+    ('élève', 'élève')
+    >>> nfd == unistr
+    False
+    >>> " ".join([f"{ord(x):04X}" for x in unistr])
+    '00E9 006C 00E8 0076 0065'
+    >>> " ".join([f"{ord(x):04X}" for x in nfd])
+    '0065 0301 006C 0065 0300 0076 0065'
+    >>> 
+    >>> 
+    >>> unistr = "한국"
+    >>> nfd = NFD(unistr)
+    >>> unistr, nfd
+    ('한국', '한국')
+    >>> " ".join([f"{ord(x):04X}" for x in unistr])
+    'D55C AD6D'
+    >>> " ".join([f"{ord(x):04X}" for x in nfd])
+    '1112 1161 11AB 1100 116E 11A8'
+    >>> 
+    >>> 
+    >>> unistr = "ﬃ"
+    >>> nfd = NFD(unistr)
+    >>> unistr, nfd
+    ('ﬃ', 'ﬃ')
+    >>> nfd == unistr
+    True
     """
 
     # Quick check for NFD
@@ -122,10 +147,35 @@ def NFC(unistr):
     Example:
 
     >>> from pyunormalize import NFC
-    >>> NFC("한국")
-    '한국'
-    >>> NFC("ﬃ")
-    'ﬃ'
+    >>> 
+    >>> unistr = "élève"
+    >>> nfc = NFC(unistr)
+    >>> unistr, nfc
+    ('élève', 'élève')
+    >>> nfc == unistr
+    False
+    >>> " ".join([f"{ord(x):04X}" for x in unistr])
+    '0065 0301 006C 0065 0300 0076 0065'
+    >>> " ".join([f"{ord(x):04X}" for x in nfc])
+    '00E9 006C 00E8 0076 0065'
+    >>> 
+    >>> 
+    >>> unistr = "한국"
+    >>> nfc = NFC(unistr)
+    >>> unistr, nfc
+    ('한국', '한국')
+    >>> " ".join([f"{ord(x):04X}" for x in unistr])
+    '1112 1161 11AB 1100 116E 11A8'
+    >>> " ".join([f"{ord(x):04X}" for x in nfc])
+    'D55C AD6D'
+    >>> 
+    >>> 
+    >>> unistr = "ﬃ"
+    >>> nfc = NFC(unistr)
+    >>> unistr, nfc
+    ('ﬃ', 'ﬃ')
+    >>> nfc == unistr
+    True
     """
     # Quick check for NFC
     prev_ccc, curr_ccc = 0, 0
@@ -161,8 +211,16 @@ def NFKD(unistr):
     Example:
 
     >>> from pyunormalize import NFKD
-    >>> NFKD("⑴")
-    '(1)'
+    >>> 
+    >>> unistr = "⑴"
+    >>> nfkd = NFKD(unistr)
+    >>> unistr, nfkd
+    ('⑴', '(1)')
+    >>> 
+    >>> " ".join([f"{ord(x):04X}" for x in unistr])
+    '2474'
+    >>> " ".join([f"{ord(x):04X}" for x in nfkd])
+    '0028 0031 0029'
     """
     # Quick check for NFKD
     prev_ccc, curr_ccc = 0, 0
@@ -197,8 +255,16 @@ def NFKC(unistr):
     Example:
 
     >>> from pyunormalize import NFKC
-    >>> NFKC("ﬃ")
-    'ffi'
+    >>> 
+    >>> unistr = "ﬃ"
+    >>> nfkc = NFKC(unistr)
+    >>> unistr, nfkc
+    ('ﬃ', 'ffi')
+    >>> 
+    >>> " ".join([f"{ord(x):04X}" for x in unistr])
+    'FB03'
+    >>> " ".join([f"{ord(x):04X}" for x in nfkc])
+    '0066 0066 0069'
     """
     # Quick check for NFKC
     prev_ccc, curr_ccc = 0, 0

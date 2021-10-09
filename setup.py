@@ -11,9 +11,9 @@ setup(
     name="pyunormalize",
     version=__version__,
     description=(
-        "Unicode normalization forms ((NFC, NFKC, NFD, NFKD). A library "
-        "independent from the Python core Unicode database. Support of "
-        "Unicode {}."
+        "Unicode normalization forms (NFC, NFKC, NFD, NFKD). A library "
+        "independent from the Python core Unicode database. This package "
+        "supports version {} of the Unicode Standard."
         .format(UNICODE_VERSION[:-2])
     ),
     long_description=long_description,
