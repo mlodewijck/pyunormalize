@@ -2,8 +2,6 @@ include LICENSE
 include UNICODE-COPYRIGHT
 include README.md
 include CHANGELOG.md
-recursive-exclude * tests
-recursive-exclude * tools
 recursive-include * *.py
 recursive-exclude * __pycache__
 recursive-exclude * *.pyc
