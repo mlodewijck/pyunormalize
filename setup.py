@@ -58,7 +58,8 @@ setup(
         "Hangul jamo characters",
     ],
     python_requires=">=3.6",
-    packages=find_packages(exclude=["tests", "tools"]),
+    # packages=find_packages(exclude=["tests", "tools"]),
+    packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
     project_urls={
