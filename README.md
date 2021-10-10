@@ -6,9 +6,9 @@ A pure Python implementation of the **Unicode Normalization Algorithm** independ
 To get the version of the Unicode character database currently used:
 
 ```python
-    >>> from pyunormalize import UCD_VERSION
-    >>> UCD_VERSION
-    '14.0.0'
+>>> from pyunormalize import UCD_VERSION
+>>> UCD_VERSION
+'14.0.0'
 ```
 
 For the formal specification of the Unicode Normalization Algorithm, see [Section 3.11, Normalization Forms](https://www.unicode.org/versions/Unicode14.0.0/ch03.pdf#G49537), in the Unicode core specification.
@@ -20,27 +20,27 @@ pip install pyunormalize
 
 ### Example usage
 ```python
-    >>> from pyunormalize import NFC, NFD, NFKC, NFKD
-    >>> s = "élève"  # "\u00E9\u006C\u00E8\u0076\u0065"
-    >>> nfc = NFC(s)
-    >>> nfd = NFD(s)
-    >>> nfc == s
-    True
-    >>> nfd == nfc
-    False
-    >>> " ".join([f"{ord(x):04X}" for x in nfc])
-    '00E9 006C 00E8 0076 0065'
-    >>> " ".join([f"{ord(x):04X}" for x in nfd])
-    '0065 0301 006C 0065 0300 0076 0065'
-    >>> 
-    >>> s = "⑴ ﬃ ²"
-    >>> NFC(s), NFKC(s), NFD(s), NFKD(s)
-    ('⑴ ﬃ ²', '(1) ffi 2', '⑴ ﬃ ²', '(1) ffi 2')
+>>> from pyunormalize import NFC, NFD, NFKC, NFKD
+>>> s = "élève"  # "\u00E9\u006C\u00E8\u0076\u0065"
+>>> nfc = NFC(s)
+>>> nfd = NFD(s)
+>>> nfc == s
+True
+>>> nfd == nfc
+False
+>>> " ".join([f"{ord(x):04X}" for x in nfc])
+'00E9 006C 00E8 0076 0065'
+>>> " ".join([f"{ord(x):04X}" for x in nfd])
+'0065 0301 006C 0065 0300 0076 0065'
+>>> 
+>>> s = "⑴ ﬃ ²"
+>>> NFC(s), NFKC(s), NFD(s), NFKD(s)
+('⑴ ﬃ ²', '(1) ffi 2', '⑴ ﬃ ²', '(1) ffi 2')
 
-    >>> from pyunormalize import normalize
-    >>> forms = ["NFC", "NFD", "NFKC", "NFKD"]
-    >>> [normalize(f, "\u017F\u0307\u0323") for f in forms]
-    ['ẛ̣', 'ẛ̣', 'ṩ', 'ṩ']
+>>> from pyunormalize import normalize
+>>> forms = ["NFC", "NFD", "NFKC", "NFKD"]
+>>> [normalize(f, "\u017F\u0307\u0323") for f in forms]
+['ẛ̣', 'ẛ̣', 'ṩ', 'ṩ']
 ```
 
 ### References
