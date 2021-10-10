@@ -2,6 +2,8 @@ include LICENSE
 include UNICODE-COPYRIGHT
 include README.md
 include CHANGELOG.md
-recursive-include * *.py
+recursive-include pyunormalize *.py
 recursive-exclude * __pycache__
 recursive-exclude * *.pyc
+prune pyunormalize/tests
+prune pyunormalize/tools
