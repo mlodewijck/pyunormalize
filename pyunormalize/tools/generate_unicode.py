@@ -1,26 +1,64 @@
-import os.path as _p
-import re
+# This script generates the pyunormalize.unicode module.
+#
+# Input files:
+#     https://www.unicode.org/Public/15.0.0/ucd/CompositionExclusions.txt
+#     https://www.unicode.org/Public/15.0.0/ucd/DerivedNormalizationProps.txt
+#     https://www.unicode.org/Public/15.0.0/ucd/UnicodeData.txt
+#
+# Output file:
+#     tools/generate_unicode/unicode.py
+#
+# The output file must be copied to the *pyunormalize* directory.
 
-# The Unicode Standard used to process the data
-UNICODE_VERSION = "14.0.0"
+import pathlib
+import urllib.error
+import urllib.request
 
-# The Unicode Character Database
-UCD_VERSION = UNICODE_VERSION
+UNICODE_VERSION = "15.0.0"
+SCRIPT_PATH = "/".join(pathlib.Path(__file__).parts[-3:])
 
-# Files from the UCD
-DATA = "UnicodeData.txt"
-EXCL = "CompositionExclusions.txt"
-PROP = "DerivedNormalizationProps.txt"
+# Files from the Unicode character database (UCD)
+EXCLUSIONS = "CompositionExclusions.txt"
+PROPS = "DerivedNormalizationProps.txt"
+UNICODE_DATA = "UnicodeData.txt"
+
+
+def read_remote(filename):
+    url = f"https://www.unicode.org/Public/{UNICODE_VERSION}/ucd/"
+    try:
+        print("\n.. Fetching URL...")
+        response = urllib.request.urlopen(f"{url}{filename}")
+        # print(response.__dict__)
+    except urllib.error.HTTPError as e:
+        raise Exception(
+            f"The server could not fulfill the request. Error code: {e.code}"
+        )
+    except urllib.error.URLError as e:
+        raise Exception(
+            f"We failed to reach a server.\nReason:\n{e.reason}"
+        )
+
+    print(".. Extracting data...")
+    return response.read().decode("utf-8").splitlines()
+
+
+def check_version(line):
+    assert UNICODE_VERSION in line, "Wrong Unicode version number."
 
 
 def main():
+    # Current working directory
+    cwd = pathlib.Path.cwd()
+
     #
     # Unicode file: UnicodeData.txt
     #
 
-    path = _p.join(_p.dirname(__file__), DATA)
-    with open(path, "r", encoding="utf-8") as f:
-        lines = f.read().splitlines()
+    try:
+        lines = (cwd / UNICODE_DATA).read_text(encoding="utf-8").splitlines()
+    except FileNotFoundError:
+        lines = read_remote(UNICODE_DATA)
+        print(".. Done.")
 
     # File version is not specified in UnicodeData.txt
     # and therefore cannot be checked.
@@ -28,11 +66,7 @@ def main():
     ccc_list = []
     dcp_list = []
     for item in lines:
-        data = item.split(";", 6)
-        code = data[0]
-        name = data[1]
-        ccc  = data[3]
-        dcp  = data[5]
+        code, name, _, ccc, _, dcp, *_ = item.split(";", 6)
         if ccc != "0":
             ccc_list.append(f"    0x{code:0>5}: {ccc:>3},  # {name}")
         if dcp:
@@ -47,14 +81,14 @@ def main():
     # Unicode file: CompositionExclusions.txt
     #
 
-    path = _p.join(_p.dirname(__file__), EXCL)
-    with open(path, "r", encoding="utf-8") as f:
-        lines = f.read().splitlines()
+    try:
+        lines = (cwd / EXCLUSIONS).read_text(encoding="utf-8").splitlines()
+    except FileNotFoundError:
+        lines = read_remote(EXCLUSIONS)
+        print(".. Done.")
 
     # Check file version
-    assert re.match(
-        f"^#.*{EXCL[:-4]}-(.+).txt.*$", lines[0]
-    ).group(1) == UCD_VERSION
+    check_version(lines[0])
 
     exclusions_list = []
     for item in lines:
@@ -69,14 +103,14 @@ def main():
     # Unicode file: DerivedNormalizationProps.txt
     #
 
-    path = _p.join(_p.dirname(__file__), PROP)
-    with open(path, "r", encoding="utf-8") as f:
-        lines = f.read().splitlines()
+    try:
+        lines = (cwd / PROPS).read_text(encoding="utf-8").splitlines()
+    except FileNotFoundError:
+        lines = read_remote(PROPS)
+        print(".. Done.")
 
     # Check file version
-    assert re.match(
-        f"^#.*{PROP[:-4]}-(.+)\.txt.*$", lines[0]
-    ).group(1) == UCD_VERSION
+    check_version(lines[0])
 
     tmp = []
     start = lines.index(
@@ -89,7 +123,6 @@ def main():
         if not line or line.startswith("#"):
             continue
         tmp.append(line)
-#    print(len(tmp))  # 1342
 
     NFD_QC_NO_list  = []
     NFKD_QC_NO_list = []
@@ -140,23 +173,24 @@ def main():
             tmp_list.append(f"    0x{code:0>5},")
 
 
-    filename = _p.basename(__file__).split("_", 1)[1]
-
     dcp = "\n".join(dcp_list)
     ccc = "\n".join(ccc_list)
     exclusions = "\n".join(exclusions_list)
-    NFD_QC_N  = "\n    ".join(NFD_QC_NO_list)
-    NFKD_QC_N = "\n    ".join(NFKD_QC_NO_list)
-    NFC_QC_N  = "\n    ".join(NFC_QC_NO_list)
-    NFC_QC_M  = "\n    ".join(NFC_QC_MAYBE_list)
-    NFKC_QC_N = "\n    ".join(NFKC_QC_NO_list)
-    NFKC_QC_M = "\n    ".join(NFKC_QC_MAYBE_list)
+    NFD_QC_N   = "\n    ".join(NFD_QC_NO_list)
+    NFKD_QC_N  = "\n    ".join(NFKD_QC_NO_list)
+    NFC_QC_N   = "\n    ".join(NFC_QC_NO_list)
+    NFC_QC_M   = "\n    ".join(NFC_QC_MAYBE_list)
+    NFKC_QC_N  = "\n    ".join(NFKC_QC_NO_list)
+    NFKC_QC_M  = "\n    ".join(NFKC_QC_MAYBE_list)
 
-    with open(filename, "w", encoding="utf-8", newline="\n") as f:
-        f.write(f"""\
-\"\"\"Data derived from the Unicode Character Database.\"\"\"
+    with open(cwd / "unicode.py", "w", encoding="utf-8", newline="\n") as f:
+        f.write(f'''\
+"""Data derived from the Unicode character database (UCD).
 
-UCD_VERSION = "{UCD_VERSION}"
+This file was generated from {SCRIPT_PATH}
+"""
+
+UNICODE_VERSION = "{UNICODE_VERSION}"
 
 # Character decomposition mappings (not including Hangul syllables)
 _DECOMP = {{
@@ -214,7 +248,7 @@ _QC_PROP_VAL = {{
     {NFKC_QC_M}
     ]),
 }}
-""")
+''')
 
 
 if __name__ == "__main__":

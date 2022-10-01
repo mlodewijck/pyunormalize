@@ -9,21 +9,13 @@ from pyunormalize import (
     NFKC,
     NFKD,
     normalize,
-    UCD_VERSION as _UCD_VERSION,
-    UNICODE_VERSION as _UNICODE_VERSION
+    UNICODE_VERSION as _UNICODE_VERSION,
 )
 
-# The Unicode Standard used to process the data
-UNICODE_VERSION = "14.0.0"
-
-# The Unicode Character Database version used
-UCD_VERSION = UNICODE_VERSION
+UNICODE_VERSION = "15.0.0"
 
 
 class Misc(unittest.TestCase):
-
-    def test_UCD_VERSION(self):
-        self.assertTrue(_UCD_VERSION == UCD_VERSION)
 
     def test_UNICODE_VERSION(self):
         self.assertTrue(_UNICODE_VERSION == UNICODE_VERSION)
@@ -109,8 +101,8 @@ class Misc(unittest.TestCase):
             [0x0105, 0x0301, 0x0302]
         )
 
-        # In www.unicode.org/versions/Unicode14.0.0/UnicodeStandard-14.0.pdf,
-        # p. 139:  "The replacement of the Starter L in R2 requires continuing
+        # In www.unicode.org/versions/Unicode15.0.0/UnicodeStandard-15.0.pdf,
+        # p. 140:  "The replacement of the Starter L in R2 requires continuing
         # to check the succeeding characters until the character at that
         # position is no longer part of any Non-blocked Pair that can be
         # replaced by a Primary Composite. For example, consider the following

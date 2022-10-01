@@ -1,12 +1,11 @@
 """Unicode conformance testing.
 
 Information about conformance testing for Unicode normalization forms:
-- www.unicode.org/Public/14.0.0/ucd/NormalizationTest.txt
-- unicode.org/reports/tr15/
+- https://www.unicode.org/Public/15.0.0/ucd/NormalizationTest.txt
+- https://www.unicode.org/reports/tr15/tr15-53.html
 """
 
-import os.path as _p
-import re
+import pathlib
 import time
 
 from pyunormalize import (
@@ -14,23 +13,15 @@ from pyunormalize import (
     NFD,
     NFKC,
     NFKD,
-    UCD_VERSION as _UCD_VERSION,
+    UNICODE_VERSION,
 )
 
-# The Unicode Standard used to process the data
-UNICODE_VERSION = "14.0.0"
-
-# The Unicode Character Database
-UCD_VERSION = UNICODE_VERSION
-
-# File from the UCD
+# Unicode conformance test file
 UNICODE_FILE = "NormalizationTest.txt"
 
 
 def parse(lines):
-    assert re.match(
-        f"^#\s*{UNICODE_FILE[:-4]}-(.+)\.txt.*$", lines[0]
-    ).group(1) == UCD_VERSION, "Wrong UCD version number."
+    assert UNICODE_VERSION in lines[0], "Wrong Unicode version number."
 
     data = []  # list of lists
     dec  = []  # needed for character by character test
@@ -45,16 +36,15 @@ def parse(lines):
             data.append([num, *rec])
             if not " " in c[0]:
                 dec.append(int(c[0], 16))
-
     s = set(dec)
     chars = [chr(x) for x in range(0x110000) if x not in s]
-
     return data, chars
 
 
 def main():
-    path = _p.join(_p.dirname(__file__), UNICODE_FILE)
-    with open(path, "r", encoding="utf-8") as f:
+#   path = pathlib.Path(__file__).parent / "data" / UNICODE_FILE
+    path = pathlib.Path.cwd() / "data" / UNICODE_FILE
+    with path.open(encoding="utf-8") as f:
         lines = f.read().splitlines()
         data, chars = parse(lines)
 
@@ -69,7 +59,7 @@ def main():
 
     print(f"\nNormalization Form C\n{'-' * 70}")
 
-    s, f = 0, 0
+    s = f = 0
     for record in data:
         num, source, nfc, nfd, nfkc, nfkd = record
 
@@ -87,7 +77,7 @@ def main():
             s += 1
         else:
             f += 1
-            print(f"Failed on line {num}.")
+            print(f"Failed on line {num}")
 
     r = s + f
     if f:
@@ -104,7 +94,7 @@ def main():
 
     print(f"Normalization Form D\n{'-' * 70}")
 
-    s, f = 0, 0
+    s = f = 0
     for record in data:
         num, source, nfc, nfd, nfkc, nfkd = record
 
@@ -122,7 +112,7 @@ def main():
             s += 1
         else:
             f += 1
-            print(f"Failed on line {num}.")
+            print(f"Failed on line {num}")
 
     r = s + f
     if f:
@@ -138,7 +128,7 @@ def main():
 
     print(f"Normalization Form KC\n{'-' * 70}")
 
-    s, f = 0, 0
+    s = f = 0
     for record in data:
         num, source, nfc, nfd, nfkc, nfkd = record
 
@@ -153,7 +143,7 @@ def main():
             s += 1
         else:
             f += 1
-            print(f"Failed on line {num}.")
+            print(f"Failed on line {num}")
 
     r = s + f
     if f:
@@ -169,7 +159,7 @@ def main():
 
     print(f"Normalization Form KD\n{'-' * 70}")
 
-    s, f = 0, 0
+    s = f = 0
     for record in data:
         num, source, nfc, nfd, nfkc, nfkd = record
 
@@ -184,7 +174,7 @@ def main():
             s += 1
         else:
             f += 1
-            print(f"Failed on line {num}.")
+            print(f"Failed on line {num}")
 
     r = s + f
     if f:
@@ -200,7 +190,7 @@ def main():
 
     print(f"Character by character test, all normalization forms\n{'-' * 70}")
 
-    s, f = 0, 0
+    s = f = 0
     for x in chars:
         lst = []
         lst.append(NFC(x))
@@ -222,16 +212,11 @@ def main():
         counter += 1
 
 
+    uax = f"UAX #15, version {UNICODE_VERSION}."
     if counter == 5:
-        print(
-            ".. Implementation conforms "
-            f"to UAX #15, version {UNICODE_VERSION}."
-        )
+        print(f".. Implementation conforms to {uax}")
     else:
-        print(
-            ".. Implementation does not conform "
-            f"to UAX #15, version {UNICODE_VERSION}."
-        )
+        print(f".. Implementation does not conform to {uax}")
 
     print(f".. {time.perf_counter() - start_time:.3f} seconds")
 

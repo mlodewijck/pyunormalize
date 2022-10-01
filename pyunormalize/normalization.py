@@ -1,4 +1,4 @@
-"""pyunormalize.normalization"""
+"""Unicode normalization algorithm."""
 
 from pyunormalize.unicode import (
     _DECOMP,       # character decomposition mappings
@@ -41,7 +41,8 @@ def _full_decomposition(decomp_dict):
             if tmp == decomposition:
                 decomp_dict[key] = decomposition  # done
                 break
-            decomposition, tmp = tmp, []
+            decomposition = tmp
+            tmp = []
 
 
 def _make_dictionaries():
@@ -107,7 +108,7 @@ def NFD(unistr):
     'ﬃ'
     """
     # Quick check for NFD
-    prev_ccc, curr_ccc = 0, 0
+    prev_ccc = curr_ccc = 0
     for u in unistr:
         u = ord(u)
         if u in _NFD_NO:  # u in _CDECOMP or 0xAC00 <= u <= 0xD7A3
@@ -116,7 +117,8 @@ def NFD(unistr):
             curr_ccc = _CCC[u]
             if curr_ccc < prev_ccc:
                 break
-        prev_ccc, curr_ccc = curr_ccc, 0
+        prev_ccc = curr_ccc
+        curr_ccc = 0
     else:
         return unistr  # source string is in NFD
 
@@ -147,7 +149,7 @@ def NFC(unistr):
     '0065 0301 006C 0065 0300 0076 0065'
     >>> " ".join([f"{ord(x):04X}" for x in nfc])
     '00E9 006C 00E8 0076 0065'
- 
+
     >>> unistr = "한국"
     >>> nfc = NFC(unistr)
     >>> unistr, nfc
@@ -161,7 +163,7 @@ def NFC(unistr):
     'ﬃ'
     """
     # Quick check for NFC
-    prev_ccc, curr_ccc = 0, 0
+    prev_ccc = curr_ccc = 0
     for u in unistr:
         u = ord(u)
         if u in _NFC_NO_OR_MAYBE:
@@ -170,7 +172,8 @@ def NFC(unistr):
             curr_ccc = _CCC[u]
             if curr_ccc < prev_ccc:
                 break
-        prev_ccc, curr_ccc = curr_ccc, 0
+        prev_ccc = curr_ccc
+        curr_ccc = 0
     else:
         return unistr  # source string is in NFC
 
@@ -197,7 +200,7 @@ def NFKD(unistr):
     '(1)'
     """
     # Quick check for NFKD
-    prev_ccc, curr_ccc = 0, 0
+    prev_ccc = curr_ccc = 0
     for u in unistr:
         u = ord(u)
         if u in _NFKD_NO:  # u in _KDECOMP or 0xAC00 <= u <= 0xD7A3
@@ -206,7 +209,8 @@ def NFKD(unistr):
             curr_ccc = _CCC[u]
             if curr_ccc < prev_ccc:
                 break
-        prev_ccc, curr_ccc = curr_ccc, 0
+        prev_ccc = curr_ccc
+        curr_ccc = 0
     else:
         return unistr  # source string is in NFKD
 
@@ -232,7 +236,7 @@ def NFKC(unistr):
     'ffi'
     """
     # Quick check for NFKC
-    prev_ccc, curr_ccc = 0, 0
+    prev_ccc = curr_ccc = 0
     for u in unistr:
         u = ord(u)
         if u in _NFKC_NO_OR_MAYBE:
@@ -241,7 +245,8 @@ def NFKC(unistr):
             curr_ccc = _CCC[u]
             if curr_ccc < prev_ccc:
                 break
-        prev_ccc, curr_ccc = curr_ccc, 0
+        prev_ccc = curr_ccc
+        curr_ccc = 0
     else:
         return unistr  # source string is in NFKC
 
@@ -263,7 +268,10 @@ def normalize(form, unistr):
     normalization form *form*. Valid values for *form* are "NFC",
     "NFD", "NFKC", and "NFKD".
 
-    Example:
+    Examples:
+
+    >>> normalize("NFKD", "⑴ ﬃ ²")
+    '(1) ffi 2'
 
     >>> forms = ["NFC", "NFD", "NFKC", "NFKD"]
     >>> [normalize(f, "\u017F\u0307\u0323") for f in forms]
@@ -286,7 +294,7 @@ _VC = _VL - _VB + 1        # 21
 _TC = _TL - _TS + 1        # 28
 
 
-def _decompose(unistr, compatibility=None):
+def _decompose(unistr, *, compatibility=False):
     # Computes the full decomposition of the Unicode string. The type of full
     # decomposition chosen depends on which Unicode normalization form is
     # involved. For NFC or NFD, one does a full canonical decomposition. For
@@ -334,19 +342,19 @@ def _reorder(items):
     # on the code point sequence, which is necessary for the normal forms to be
     # unique.
 
-    for i, j in enumerate(items):
-        if j not in _CCC:  # character is a starter
+    for n, elem in enumerate(items):
+        if elem not in _CCC:  # character is a starter
             continue
-        idx = i
-        while i < len(items) and items[i] in _CCC:
-            i += 1
-        if i == idx + 1:
+        m = n
+        while n < len(items) and items[n] in _CCC:
+            n += 1
+        if n == m + 1:
             continue
-        ccc_val = [_CCC[x] for x in items[idx:i]]
-        if ccc_val != sorted(ccc_val):
-            items[idx:i] = (
-                items[x] for _, x in sorted(zip(ccc_val, range(idx, i)))
-            )
+        slice_ = items[m:n]
+        ccc_values = [_CCC[x] for x in slice_]
+        if ccc_values != sorted(ccc_values):
+            items[m:n] = \
+                [x for *_, x in sorted(zip(ccc_values, range(m, n), slice_))]
 
     return items
 

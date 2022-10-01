@@ -1,48 +1,41 @@
-from setuptools import setup, find_packages
+"""Setup script for pyunormalize."""
 
-from pyunormalize import __version__, UNICODE_VERSION
+from setuptools import setup, find_packages
 
 URL = "https://github.com/mlodewijck/pyunormalize"
 
-with open("README.md", "r", encoding="utf-8") as fh:
-    long_description = fh.read()
+
+def get_version():
+    version_file = "pyunormalize/_version.py"
+    with open(version_file) as f:
+        exec(compile(f.read(), version_file, "exec"))
+    return locals()["__version__"]
+
+with open("README.md", encoding="utf-8") as f:
+    README = f.read()
 
 setup(
     name="pyunormalize",
-    version=__version__,
+    version=get_version(),
     description=(
         "Unicode normalization forms (NFC, NFKC, NFD, NFKD). A library "
-        "independent from the Python core Unicode database. This package "
-        "supports version {} of the Unicode Standard."
-        .format(UNICODE_VERSION[:-2])
+        "independent from the Python core Unicode database."
     ),
-    long_description=long_description,
+    long_description=README,
     long_description_content_type="text/markdown",
-    url=URL,
     author="Marc Lodewijck",
     author_email="mlodewijck@gmail.com",
     license="MIT",
-    classifiers=[
-        "Intended Audience :: Developers",
-        "Topic :: Software Development",
-        "Topic :: Software Development :: Internationalization",
-        "Topic :: Software Development :: Libraries",
-        "Topic :: Software Development :: Libraries :: Python Modules",
-        "Topic :: Text Processing",
-        "Topic :: Text Processing :: Linguistic",
-        "Topic :: Utilities",
-        "License :: OSI Approved :: MIT License",
-        "Programming Language :: Python :: 3 :: Only",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
-    ],
+    url=URL,
+    project_urls={
+        "Bug Reports": "{}/issues".format(URL),
+        "Source": "{}/".format(URL),
+    },
     keywords=[
         "Unicode",
         "Unicode data",
         "Unicode normalization",
+        "normalization",
         "NFC",
         "NFD",
         "NFKC",
@@ -57,12 +50,25 @@ setup(
         "Hangul syllables",
         "Hangul jamo characters",
     ],
+    # Trove classifiers
+    classifiers=[
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Topic :: Software Development",
+        "Topic :: Software Development :: Internationalization",
+        "Topic :: Text Processing",
+        "Topic :: Text Processing :: Linguistic",
+        "Topic :: Utilities",
+    ],
     python_requires=">=3.6",
     packages=find_packages(),
     include_package_data=True,
+    # All data files matched by MANIFEST.in will get included
+    # if they are inside a package directory.
     zip_safe=False,
-    project_urls={
-        "Bug Reports": "{}/issues".format(URL),
-        "Source": "{}/".format(URL),
-    },
 )
