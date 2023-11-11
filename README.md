@@ -1,7 +1,7 @@
 # pyunormalize
-A pure Python implementation of the **Unicode normalization algorithm** independent from the Python core Unicode database. This package supports version&nbsp;15.0 of the Unicode standard (released on September&nbsp;13, 2022). It has been thoroughly tested against the [Unicode test file](https://www.unicode.org/Public/15.0.0/ucd/NormalizationTest.txt).
+A pure Python implementation of the **Unicode normalization algorithm** independent from the Python core Unicode database. This package supports version&nbsp;15.1 of the Unicode standard (released in September&nbsp;2023). It has been thoroughly tested against the [Unicode test file](https://www.unicode.org/Public/15.1.0/ucd/NormalizationTest.txt).
 
-For the formal specification of the Unicode normalization algorithm, see [Section 3.11, Normalization Forms](https://www.unicode.org/versions/Unicode15.0.0/ch03.pdf#G49537), in the Unicode core specification.
+For the formal specification of the Unicode normalization algorithm, see [Section 3.11, Normalization Forms](https://www.unicode.org/versions/Unicode15.1.0/ch03.pdf#G49537), in the Unicode core specification.
 
 ### Installation
 The easiest method to install is using pip:
@@ -46,10 +46,10 @@ False
 
 ### Related resources
 This implementation is based on the following resources:
-- [Section 3.11, Normalization Forms, in the Unicode core specification, version&nbsp;15.0.0](https://www.unicode.org/versions/Unicode15.0.0/ch03.pdf#G49537)
-- [Unicode Standard Annex #15: Unicode Normalization Forms, version&nbsp;53](https://www.unicode.org/reports/tr15/tr15-53.html)
+- [Section 3.11, Normalization Forms, in the Unicode core specification, version&nbsp;15.1.0](https://www.unicode.org/versions/Unicode15.1.0/ch03.pdf#G49537)
+- [Unicode Standard Annex #15: Unicode Normalization Forms, version&nbsp;54](https://www.unicode.org/reports/tr15/tr15-54.html)
 
 ### Licenses
 The code is available under the [MIT license](https://github.com/mlodewijck/pyunormalize/blob/master/LICENSE).
 
-Usage of Unicode data files is governed by the [UNICODE TERMS OF USE](https://www.unicode.org/copyright.html), a copy of which is included as [UNICODE-LICENSE](https://github.com/mlodewijck/pyunormalize/blob/master/UNICODE-LICENSE).
+Usage of Unicode data files is governed by the [UNICODE TERMS OF USE](https://www.unicode.org/copyright.html). Further specifications of rights and restrictions pertaining to the use of the Unicode data files and software can be found in the [Unicode Data Files and Software License](https://www.unicode.org/license.txt), a copy of which is included as [UNICODE-LICENSE](https://github.com/mlodewijck/pyunormalize/blob/master/UNICODE-LICENSE).

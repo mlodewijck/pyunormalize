@@ -12,7 +12,7 @@ from pyunormalize import (
     UNICODE_VERSION as _UNICODE_VERSION,
 )
 
-UNICODE_VERSION = "15.0.0"
+UNICODE_VERSION = "15.1.0"
 
 
 class Misc(unittest.TestCase):
@@ -101,7 +101,7 @@ class Misc(unittest.TestCase):
             [0x0105, 0x0301, 0x0302]
         )
 
-        # In www.unicode.org/versions/Unicode15.0.0/UnicodeStandard-15.0.pdf,
+        # At https://www.unicode.org/versions/Unicode15.0.0/UnicodeStandard-15.0.pdf,
         # p. 140:  "The replacement of the Starter L in R2 requires continuing
         # to check the succeeding characters until the character at that
         # position is no longer part of any Non-blocked Pair that can be

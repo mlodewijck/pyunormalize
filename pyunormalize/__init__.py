@@ -1,14 +1,14 @@
 """A pure Python implementation of the Unicode normalization algorithm
 independent from the Python core Unicode database. This package supports
-version 15.0 of the Unicode standard (released on September 13, 2022).
+version 15.1 of the Unicode standard (released in September 2023).
 It has been thoroughly tested against the Unicode test file found
-at https://www.unicode.org/Public/15.0.0/ucd/NormalizationTest.txt
+at https://www.unicode.org/Public/15.1.0/ucd/NormalizationTest.txt
 
 To get the version of the Unicode character database currently used:
 
     >>> from pyunormalize import UCD_VERSION
     >>> UCD_VERSION
-    '15.0.0'
+    '15.1.0'
 
 For the formal specification of the Unicode normalization algorithm,
 see Section 3.11, Normalization Forms, in the Unicode core specification.
@@ -31,8 +31,8 @@ __all__ = [
 ]
 
 # Unicode standard used to process the data
-# Version released on September 13, 2022
-UNICODE_VERSION = UCD_VERSION = "15.0.0"
+# Release date: September 2023
+UNICODE_VERSION = UCD_VERSION = "15.1.0"
 
 
 from pyunormalize import _version

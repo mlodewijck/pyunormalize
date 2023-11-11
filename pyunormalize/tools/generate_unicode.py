@@ -1,9 +1,9 @@
 # This script generates the pyunormalize.unicode module.
 #
 # Input files:
-#     https://www.unicode.org/Public/15.0.0/ucd/CompositionExclusions.txt
-#     https://www.unicode.org/Public/15.0.0/ucd/DerivedNormalizationProps.txt
-#     https://www.unicode.org/Public/15.0.0/ucd/UnicodeData.txt
+#     https://www.unicode.org/Public/15.1.0/ucd/CompositionExclusions.txt
+#     https://www.unicode.org/Public/15.1.0/ucd/DerivedNormalizationProps.txt
+#     https://www.unicode.org/Public/15.1.0/ucd/UnicodeData.txt
 #
 # Output file:
 #     tools/generate_unicode/unicode.py
@@ -14,7 +14,7 @@ import pathlib
 import urllib.error
 import urllib.request
 
-UNICODE_VERSION = "15.0.0"
+UNICODE_VERSION = "15.1.0"
 SCRIPT_PATH = "/".join(pathlib.Path(__file__).parts[-3:])
 
 # Files from the Unicode character database (UCD)
@@ -38,7 +38,7 @@ def read_remote(filename):
             f"We failed to reach a server.\nReason:\n{e.reason}"
         )
 
-    print(".. Extracting data...")
+    print(f".. Extracting data from {filename}")
     return response.read().decode("utf-8").splitlines()
 
 
@@ -124,10 +124,10 @@ def main():
             continue
         tmp.append(line)
 
-    NFD_QC_NO_list  = []
+    NFD_QC_NO_list = []
     NFKD_QC_NO_list = []
-    NFC_QC_NO_list  = []
-    NFC_QC_MAYBE_list  = []
+    NFC_QC_NO_list = []
+    NFC_QC_MAYBE_list = []
     NFKC_QC_NO_list = []
     NFKC_QC_MAYBE_list = []
 
@@ -170,7 +170,7 @@ def main():
                 tmp_list = prop_values[prop][1]
             else:
                 tmp_list = prop_values[prop]
-            tmp_list.append(f"    0x{code:0>5},")
+            tmp_list.append(f"           0x{code:0>5},")
 
 
     dcp = "\n".join(dcp_list)
@@ -212,39 +212,39 @@ _QC_PROP_VAL = {{
 
     # NFD_Quick_Check=No
     # Characters that cannot ever occur in the normalization form D
-    "NFD_QC=N": set([
+    "nfd_no": set([
     {NFD_QC_N}
     ]),
 
     # NFKD_Quick_Check=No
     # Characters that cannot ever occur in the normalization form KD
-    "NFKD_QC=N": set([
+    "nfkd_no": set([
     {NFKD_QC_N}
     ]),
 
     # NFC_Quick_Check=No
     # Characters that cannot ever occur in the normalization form C
-    "NFC_QC=N": set([
+    "nfc_no": set([
     {NFC_QC_N}
     ]),
 
     # NFC_Quick_Check=Maybe
     # Characters that may or may not occur in the normalization form C,
     # depending on the context
-    "NFC_QC=M": set([
+    "nfc_maybe": set([
     {NFC_QC_M}
     ]),
 
     # NFKC_Quick_Check=No
     # Characters that cannot ever occur in the normalization form KC
-    "NFKC_QC=N": set([
+    "nfkc_no": set([
     {NFKC_QC_N}
     ]),
 
     # NFKC_Quick_Check=Maybe
     # Characters that may or may not occur in the normalization form KC,
     # depending on the context
-    "NFKC_QC=M": set([
+    "nfkc_maybe": set([
     {NFKC_QC_M}
     ]),
 }}

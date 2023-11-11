@@ -65,14 +65,15 @@ def _make_dictionaries():
 
 _make_dictionaries()
 
+del _DECOMP
+
 
 #
 # Public interface
 #
 
-
 # Code points listed for NFD_Quick_Check=No
-_NFD_NO = _QC_PROP_VAL["NFD_QC=N"]
+_NFD_NO = _QC_PROP_VAL["nfd_no"]
 
 def NFD(unistr):
     """Return the canonical equivalent "decomposed" form of the
@@ -90,22 +91,23 @@ def NFD(unistr):
     ('élève', 'élève')
     >>> nfd == unistr
     False
-    >>> " ".join([f"{ord(x):04X}" for x in unistr])
+    >>> " ".join(f"{ord(x):04X}" for x in unistr)
     '00E9 006C 00E8 0076 0065'
-    >>> " ".join([f"{ord(x):04X}" for x in nfd])
+    >>> " ".join(f"{ord(x):04X}" for x in nfd)
     '0065 0301 006C 0065 0300 0076 0065'
 
     >>> unistr = "한국"
     >>> nfd = NFD(unistr)
     >>> unistr, nfd
     ('한국', '한국')
-    >>> " ".join([f"{ord(x):04X}" for x in unistr])
+    >>> " ".join(f"{ord(x):04X}" for x in unistr)
     'D55C AD6D'
-    >>> " ".join([f"{ord(x):04X}" for x in nfd])
+    >>> " ".join(f"{ord(x):04X}" for x in nfd)
     '1112 1161 11AB 1100 116E 11A8'
 
     >>> NFD("ﬃ")
     'ﬃ'
+
     """
     # Quick check for NFD
     prev_ccc = curr_ccc = 0
@@ -123,12 +125,13 @@ def NFD(unistr):
         return unistr  # source string is in NFD
 
     # Normalize to NFD
-    result = _reorder(_decompose(unistr))
-    return "".join([chr(x) for x in result])
+    # _reorder(_decompose(unistr))
+    result = map(chr, _reorder(_decompose(unistr)))
+    return "".join(result)
 
 
 # Code points listed for NFC_Quick_Check=No or NFC_Quick_Check=Maybe
-_NFC_NO_OR_MAYBE = _QC_PROP_VAL["NFC_QC=N"] | _QC_PROP_VAL["NFC_QC=M"]
+_NFC_NO_OR_MAYBE = _QC_PROP_VAL["nfc_no"] | _QC_PROP_VAL["nfc_maybe"]
 
 def NFC(unistr):
     """Return the canonical equivalent "composed" form of the original
@@ -145,22 +148,23 @@ def NFC(unistr):
     ('élève', 'élève')
     >>> nfc == unistr
     False
-    >>> " ".join([f"{ord(x):04X}" for x in unistr])
+    >>> " ".join(f"{ord(x):04X}" for x in unistr)
     '0065 0301 006C 0065 0300 0076 0065'
-    >>> " ".join([f"{ord(x):04X}" for x in nfc])
+    >>> " ".join(f"{ord(x):04X}" for x in nfc)
     '00E9 006C 00E8 0076 0065'
 
     >>> unistr = "한국"
     >>> nfc = NFC(unistr)
     >>> unistr, nfc
     ('한국', '한국')
-    >>> " ".join([f"{ord(x):04X}" for x in unistr])
+    >>> " ".join(f"{ord(x):04X}" for x in unistr)
     '1112 1161 11AB 1100 116E 11A8'
-    >>> " ".join([f"{ord(x):04X}" for x in nfc])
+    >>> " ".join(f"{ord(x):04X}" for x in nfc)
     'D55C AD6D'
 
     >>> NFC("ﬃ")
     'ﬃ'
+
     """
     # Quick check for NFC
     prev_ccc = curr_ccc = 0
@@ -178,13 +182,13 @@ def NFC(unistr):
         return unistr  # source string is in NFC
 
     # Normalize to NFC
-    # result = _compose(_reorder(_decompose(unistr)))
-    result = _compose([ord(u) for u in NFD(unistr)])
-    return "".join([chr(x) for x in result])
+    # _compose(_reorder(_decompose(unistr)))
+    result = map(chr, _compose([*map(ord, NFD(unistr))]))
+    return "".join(result)
 
 
 # Code points listed for NFKD_Quick_Check=No
-_NFKD_NO = _QC_PROP_VAL["NFKD_QC=N"]
+_NFKD_NO = _QC_PROP_VAL["nfkd_no"]
 
 def NFKD(unistr):
     """Return the compatibility equivalent "decomposed" form of the
@@ -198,6 +202,7 @@ def NFKD(unistr):
 
     >>> NFKD("⑴")
     '(1)'
+
     """
     # Quick check for NFKD
     prev_ccc = curr_ccc = 0
@@ -215,12 +220,13 @@ def NFKD(unistr):
         return unistr  # source string is in NFKD
 
     # Normalize to NFKD
-    result = _reorder(_decompose(unistr, compatibility=True))
-    return "".join([chr(x) for x in result])
+    # _reorder(_decompose(unistr, compatibility=True))
+    result = map(chr, _reorder(_decompose(unistr, compatibility=True)))
+    return "".join(result)
 
 
 # Code points listed for NFKC_Quick_Check=No or NFKC_Quick_Check=Maybe
-_NFKC_NO_OR_MAYBE = _QC_PROP_VAL["NFKC_QC=N"] | _QC_PROP_VAL["NFKC_QC=M"]
+_NFKC_NO_OR_MAYBE = _QC_PROP_VAL["nfkc_no"] | _QC_PROP_VAL["nfkc_maybe"]
 
 def NFKC(unistr):
     """Return the compatibility equivalent "composed" form of the
@@ -234,6 +240,7 @@ def NFKC(unistr):
 
     >>> NFKC("ﬃ")
     'ffi'
+
     """
     # Quick check for NFKC
     prev_ccc = curr_ccc = 0
@@ -251,12 +258,13 @@ def NFKC(unistr):
         return unistr  # source string is in NFKC
 
     # Normalize to NFKC
-    # result = _compose(_reorder(_decompose(unistr, compatibility=True)))
-    result = _compose([ord(u) for u in NFKD(unistr)])
-    return "".join([chr(x) for x in result])
+    # _compose(_reorder(_decompose(unistr, compatibility=True)))
+    result = map(chr, _compose([*map(ord, NFKD(unistr))]))
+    return "".join(result)
 
 
-_dispatch = {
+# Dictionary for normalization forms dispatch
+_normalization_forms = {
     "NFD"  : NFD,
     "NFC"  : NFC,
     "NFKD" : NFKD,
@@ -276,22 +284,35 @@ def normalize(form, unistr):
     >>> forms = ["NFC", "NFD", "NFKC", "NFKD"]
     >>> [normalize(f, "\u017F\u0307\u0323") for f in forms]
     ['ẛ̣', 'ẛ̣', 'ṩ', 'ṩ']
+
     """
-    return _dispatch[form](unistr)
+    return _normalization_forms[form](unistr)
 
 
 #
 # Internals
 #
 
+# Hangul syllables for modern Korean
+_SB = 0xAC00
+_SL = 0xD7A3
 
-_SB, _SL = 0xAC00, 0xD7A3  # Hangul syllables for modern Korean
-_LB, _LL = 0x1100, 0x1112  # Hangul leading consonants (syllable onsets)
-_VB, _VL = 0x1161, 0x1175  # Hangul vowels (syllable nucleuses)
-_TB, _TL = 0x11A8, 0x11C2  # Hangul trailing consonants (syllable codas)
-_TS      = 0x11A7          # one less than _TB
-_VC = _VL - _VB + 1        # 21
-_TC = _TL - _TS + 1        # 28
+# Hangul leading consonants (syllable onsets)
+_LB = 0x1100
+_LL = 0x1112
+
+# Hangul vowels (syllable nucleuses)
+_VB = 0x1161
+_VL = 0x1175
+
+# Hangul trailing consonants (syllable codas)
+_TB = 0x11A8
+_TL = 0x11C2
+
+_TS = 0x11A7  # _TB - 1
+
+_VCOUNT = 21  # _VL - _VB + 1
+_TCOUNT = 28  # _TL - _TS + 1
 
 
 def _decompose(unistr, *, compatibility=False):
@@ -300,8 +321,9 @@ def _decompose(unistr, *, compatibility=False):
     # involved. For NFC or NFD, one does a full canonical decomposition. For
     # NFKC or NFKD, one does a full compatibility decomposition.
 
-    decomp = _KDECOMP if compatibility else _CDECOMP
     result = []
+    decomp = _KDECOMP if compatibility else _CDECOMP
+
     for u in unistr:
         u = ord(u)
         if u in decomp:
@@ -314,25 +336,25 @@ def _decompose(unistr, *, compatibility=False):
     return result
 
 
-def _decompose_hangul_syllable(s):
+def _decompose_hangul_syllable(cp):
     # Hangul syllable decomposition algorithm. Arithmetically derives the full
     # canonical decomposition of a precomposed Hangul syllable.
 
-    sidx = s - _SB
-    tidx = sidx % _TC
-    _ = (sidx - tidx) // _TC
-    V = _VB + (_  % _VC)
-    L = _LB + (_ // _VC)
+    sindex = cp - _SB
+    tindex = sindex % _TCOUNT
+    q = (sindex - tindex) // _TCOUNT
+    V = _VB + (q  % _VCOUNT)
+    L = _LB + (q // _VCOUNT)
 
-    if tidx:
+    if tindex:
         # LVT syllable
-        return (L, V, _TS + tidx)
+        return (L, V, _TS + tindex)
 
     # LV syllable
     return (L, V)
 
 
-def _reorder(items):
+def _reorder(elems):
     # Canonical ordering algorithm. Once a string has been fully decomposed,
     # any sequences of combining marks that it contains are put into a
     # well-defined order. Only the subset of combining marks which have
@@ -342,35 +364,35 @@ def _reorder(items):
     # on the code point sequence, which is necessary for the normal forms to be
     # unique.
 
-    for n, elem in enumerate(items):
+    for n, elem in enumerate(elems):
         if elem not in _CCC:  # character is a starter
             continue
         m = n
-        while n < len(items) and items[n] in _CCC:
+        while n < len(elems) and elems[n] in _CCC:
             n += 1
         if n == m + 1:
             continue
-        slice_ = items[m:n]
-        ccc_values = [_CCC[x] for x in slice_]
+        chunk = elems[m:n]
+        ccc_values = [_CCC[x] for x in chunk]
         if ccc_values != sorted(ccc_values):
-            items[m:n] = \
-                [x for *_, x in sorted(zip(ccc_values, range(m, n), slice_))]
+            elems[m:n] = \
+                [x for *_, x in sorted(zip(ccc_values, range(m, n), chunk))]
 
-    return items
+    return elems
 
 
-def _compose(items):
+def _compose(elems):
     # Canonical composition algorithm. That process transforms the fully
     # decomposed and canonically ordered string into its most fully composed
     # but still canonically equivalent sequence.
 
-    for i, x in enumerate(items):
+    for i, x in enumerate(elems):
         if x is None or x in _CCC:
             continue
 
         last_cc = False  # _CCC[x] = 0
         blocked = False
-        for j, y in enumerate(items[i + 1 :], i + 1):
+        for j, y in enumerate(elems[i + 1 :], i + 1):
             if y in _CCC:
                 last_cc = True  # _CCC[y] > 0
             else:
@@ -379,7 +401,8 @@ def _compose(items):
             if blocked and last_cc:
                 continue
 
-            prev = items[j - 1]
+            prev = elems[j - 1]
+
             if prev is None or prev not in _CCC or _CCC[prev] < _CCC[y]:
                 pair = (x, y)  # x: last starter preceding y
                 if pair in _PRECOMP:
@@ -391,14 +414,14 @@ def _compose(items):
                     if blocked:
                         break
                 else:
-                    items[i] = x = precomp
-                    items[j] = None
+                    elems[i] = x = precomp
+                    elems[j] = None
                     if blocked:
                         blocked = False
                     else:
                         last_cc = False
 
-    return [item for item in items if item is not None]
+    return [*filter(None, elems)]
 
 
 def _compose_hangul_syllable(x, y):
@@ -407,13 +430,11 @@ def _compose_hangul_syllable(x, y):
     # to an equivalent precomposed Hangul syllable.
 
     if _LB <= x <= _LL and _VB <= y <= _VL:
-        # Compose a leading consonant and a vowel
-        # into an LV syllable
-        return _SB + (((x - _LB) * _VC) + y - _VB) * _TC
+        # Compose a leading consonant and a vowel into an LV syllable
+        return _SB + (((x - _LB) * _VCOUNT) + y - _VB) * _TCOUNT
 
-    if _SB <= x <= _SL and not (x - _SB) % _TC and _TB <= y <= _TL:
-        # Compose an LV syllable and a trailing consonant
-        # into an LVT syllable
+    if _SB <= x <= _SL and not (x - _SB) % _TCOUNT and _TB <= y <= _TL:
+        # Compose an LV syllable and a trailing consonant into an LVT syllable
         return x + y - _TS
 
     return None

@@ -1,8 +1,8 @@
 """Unicode conformance testing.
 
 Information about conformance testing for Unicode normalization forms:
-- https://www.unicode.org/Public/15.0.0/ucd/NormalizationTest.txt
-- https://www.unicode.org/reports/tr15/tr15-53.html
+- https://www.unicode.org/Public/15.1.0/ucd/NormalizationTest.txt
+- https://www.unicode.org/reports/tr15/tr15-54.html
 """
 
 import pathlib
@@ -23,30 +23,33 @@ UNICODE_FILE = "NormalizationTest.txt"
 def parse(lines):
     assert UNICODE_VERSION in lines[0], "Wrong Unicode version number."
 
-    data = []  # list of lists
-    dec  = []  # needed for character by character test
+    data = []    # list of lists
+    dec = set()  # needed for character by character test
+
     for num, line in enumerate(lines, 1):
         if line and not line.startswith(("#", "@")):
             *c, _ = line.split(";", 5)
-            rec = [
+            record = [
                 "".join(chr(int(x, 16)) for x in seq.split())
                 for seq in c
             ]
-            # rec: [source, nfc, nfd, nfkc, nfkd]
-            data.append([num, *rec])
+            # record: [source, nfc, nfd, nfkc, nfkd]
+            data.append([num, *record])
+
             if not " " in c[0]:
-                dec.append(int(c[0], 16))
-    s = set(dec)
-    chars = [chr(x) for x in range(0x110000) if x not in s]
+                dec.add(int(c[0], 16))
+
+    chars = [chr(x) for x in range(0x110000) if x not in dec]
+
     return data, chars
 
 
 def main():
-#   path = pathlib.Path(__file__).parent / "data" / UNICODE_FILE
     path = pathlib.Path.cwd() / "data" / UNICODE_FILE
     with path.open(encoding="utf-8") as f:
         lines = f.read().splitlines()
-        data, chars = parse(lines)
+
+    data, chars = parse(lines)
 
     counter = 0
     start_time = time.perf_counter()
