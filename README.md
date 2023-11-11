@@ -14,7 +14,7 @@ To get the version of the Unicode character database currently used:
 ```python
 >>> from pyunormalize import UCD_VERSION
 >>> UCD_VERSION
-'15.0.0'
+'15.1.0'
 ```
 
 ### Example usage
