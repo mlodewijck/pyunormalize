@@ -1,20 +1,23 @@
 # pyunormalize
-A pure Python implementation of the **Unicode normalization algorithm** independent from the Python core Unicode database. This package supports version&nbsp;15.1 of the Unicode standard (released in September&nbsp;2023). It has been thoroughly tested against the [Unicode test file](https://www.unicode.org/Public/15.1.0/ucd/NormalizationTest.txt).
+A pure Python implementation of the **Unicode normalization algorithm** independent of Python’s core Unicode database. This package conforms to version&nbsp;16.0 of the Unicode standard, released in September&nbsp;2024, and has been rigorously tested for accuracy using the official [Unicode test file](https://www.unicode.org/Public/16.0.0/ucd/NormalizationTest.txt).
 
-For the formal specification of the Unicode normalization algorithm, see [Section 3.11, Normalization Forms](https://www.unicode.org/versions/Unicode15.1.0/ch03.pdf#G49537), in the Unicode core specification.
-
-### Installation
-The easiest method to install is using pip:
+### Installation and updates
+To install the package, run:
 ```shell
 pip install pyunormalize
 ```
 
-### UCD version
-To get the version of the Unicode character database currently used:
+To upgrade to the latest version, run:
+```shell
+pip install pyunormalize --upgrade
+```
+
+### Unicode character database (UCD) version
+To retrieve the version of the Unicode character database in use:
 ```python
 >>> from pyunormalize import UCD_VERSION
 >>> UCD_VERSION
-'15.1.0'
+'16.0.0'
 ```
 
 ### Example usage
@@ -46,10 +49,10 @@ False
 
 ### Related resources
 This implementation is based on the following resources:
-- [Section 3.11, Normalization Forms, in the Unicode core specification, version&nbsp;15.1.0](https://www.unicode.org/versions/Unicode15.1.0/ch03.pdf#G49537)
-- [Unicode Standard Annex #15: Unicode Normalization Forms, version&nbsp;54](https://www.unicode.org/reports/tr15/tr15-54.html)
+- [Section 3.11, “Normalization Forms,” in the Unicode core specification, version&nbsp;16.0.0](https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G49537)
+- [Unicode Standard Annex #15: Unicode Normalization Forms, revision&nbsp;56](https://www.unicode.org/reports/tr15/tr15-56.html)
 
 ### Licenses
-The code is available under the [MIT license](https://github.com/mlodewijck/pyunormalize/blob/master/LICENSE).
+The code is licensed under the [MIT license](https://github.com/mlodewijck/pyunormalize/blob/master/LICENSE).
 
-Usage of Unicode data files is governed by the [UNICODE TERMS OF USE](https://www.unicode.org/copyright.html). Further specifications of rights and restrictions pertaining to the use of the Unicode data files and software can be found in the [Unicode Data Files and Software License](https://www.unicode.org/license.txt), a copy of which is included as [UNICODE-LICENSE](https://github.com/mlodewijck/pyunormalize/blob/master/UNICODE-LICENSE).
+Usage of Unicode data files is subject to the [UNICODE TERMS OF USE](https://www.unicode.org/copyright.html). Additional rights and restrictions regarding Unicode data files and software are outlined in the [Unicode Data Files and Software License](https://www.unicode.org/license.txt), a copy of which is included as [UNICODE-LICENSE](https://github.com/mlodewijck/pyunormalize/blob/master/UNICODE-LICENSE).

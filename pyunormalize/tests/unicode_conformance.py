@@ -1,11 +1,11 @@
 """Unicode conformance testing.
 
 Information about conformance testing for Unicode normalization forms:
-- https://www.unicode.org/Public/15.1.0/ucd/NormalizationTest.txt
-- https://www.unicode.org/reports/tr15/tr15-54.html
+    - https://www.unicode.org/Public/16.0.0/ucd/NormalizationTest.txt
+    - https://www.unicode.org/reports/tr15/tr15-56.html
 """
 
-import pathlib
+import os
 import time
 
 from pyunormalize import (
@@ -21,32 +21,38 @@ UNICODE_FILE = "NormalizationTest.txt"
 
 
 def parse(lines):
+    # Check file version
     assert UNICODE_VERSION in lines[0], "Wrong Unicode version number."
 
-    data = []    # list of lists
-    dec = set()  # needed for character by character test
+    data = []  # list of lists
+    dec  = []  # needed for character by character test
 
     for num, line in enumerate(lines, 1):
         if line and not line.startswith(("#", "@")):
             *c, _ = line.split(";", 5)
-            record = [
-                "".join(chr(int(x, 16)) for x in seq.split())
+
+            rec = [
+                "".join([chr(int(x, 16)) for x in seq.split()])
                 for seq in c
             ]
-            # record: [source, nfc, nfd, nfkc, nfkd]
-            data.append([num, *record])
+
+            # rec: [source, nfc, nfd, nfkc, nfkd]
+            data.append([num, *rec])
 
             if not " " in c[0]:
-                dec.add(int(c[0], 16))
+                dec.append(int(c[0], 16))
 
-    chars = [chr(x) for x in range(0x110000) if x not in dec]
+    s = set(dec)
+    chars = [chr(x) for x in range(0x110000) if x not in s]
 
     return data, chars
 
 
 def main():
-    path = pathlib.Path.cwd() / "data" / UNICODE_FILE
-    with path.open(encoding="utf-8") as f:
+    data_dir = os.path.join("pyunormalize", "tests", "data")
+    path = os.path.join(data_dir, UNICODE_FILE)
+
+    with open(path, encoding="utf-8") as f:
         lines = f.read().splitlines()
 
     data, chars = parse(lines)
@@ -172,7 +178,7 @@ def main():
         lst.append(NFKD(nfd))
         lst.append(NFKD(nfkc))
         lst.append(NFKD(nfkd))
- 
+
         if lst.count(nfkd) == len(lst):
             s += 1
         else:
@@ -216,6 +222,7 @@ def main():
 
 
     uax = f"UAX #15, version {UNICODE_VERSION}."
+
     if counter == 5:
         print(f".. Implementation conforms to {uax}")
     else:

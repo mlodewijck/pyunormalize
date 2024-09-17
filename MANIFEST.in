@@ -1,3 +1,4 @@
-include UNICODE-LICENSE
-global-include *.txt
+prune pyunormalize/tests
 global-exclude *.pyc __pycache__
+exclude tox.ini
+include UNICODE-LICENSE
