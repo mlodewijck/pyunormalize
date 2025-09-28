@@ -1,4 +1,11 @@
+# Exclude tests directory from the distribution
 prune pyunormalize/tests
-global-exclude *.pyc __pycache__
-exclude tox.ini
+
+# Exclude compiled Python files and __pycache__ directories globally
+global-exclude __pycache__ *.py[cod]
+
+# Include important documentation and license files
+include README.md
+include CHANGELOG.md
+include LICENSE
 include UNICODE-LICENSE

@@ -1,5 +1,12 @@
 # pyunormalize
-A pure Python implementation of the **Unicode normalization algorithm** independent of Python’s core Unicode database. This package conforms to version&nbsp;16.0 of the Unicode standard, released in September&nbsp;2024, and has been rigorously tested for accuracy using the official [Unicode test file](https://www.unicode.org/Public/16.0.0/ucd/NormalizationTest.txt).
+A pure-Python implementation of the **Unicode normalization algorithm**. This package conforms strictly to version&nbsp;17.0 of the Unicode Standard, released in September&nbsp;2025, by using its own dedicated data derived from the Unicode character database&nbsp;(UCD) corresponding to that version. This approach ensures total independence from the Unicode version built into the host Python environment.
+
+All normalization functions (NFC, NFD, NFKC, and NFKD) have been thoroughly tested against the official [Unicode test file](https://www.unicode.org/Public/17.0.0/ucd/NormalizationTest.txt) for accuracy.
+
+### Python support policy
+This package requires **Python 3.8 or newer**.
+
+In version 17.0.0 of `pyunormalize`, support for Python&nbsp;3.6 and 3.7 was dropped. These interpreters are past end-of-life and cannot be used reliably with modern Python packaging and installation tools.
 
 ### Installation and updates
 To install the package, run:
@@ -12,47 +19,72 @@ To upgrade to the latest version, run:
 pip install pyunormalize --upgrade
 ```
 
+### Changelog
+Check out the latest updates and changes [here](https://github.com/mlodewijck/pyunormalize/blob/master/CHANGELOG.md).
+
 ### Unicode character database (UCD) version
-To retrieve the version of the Unicode character database in use:
+Retrieve the version of the Unicode character database in use:
 ```python
 >>> from pyunormalize import UCD_VERSION
->>> UCD_VERSION
-'16.0.0'
+>>> print(UCD_VERSION)
+17.0.0
 ```
 
-### Example usage
-```python
->>> from pyunormalize import NFC, NFD, NFKC, NFKD
->>> s = "élève"  # "\u00E9\u006C\u00E8\u0076\u0065"
->>> nfc = NFC(s)
->>> nfd = NFD(s)
->>> nfc == s
-True
->>> nfd == nfc
-False
->>> " ".join([f"{ord(x):04X}" for x in nfc])
-'00E9 006C 00E8 0076 0065'
->>> " ".join([f"{ord(x):04X}" for x in nfd])
-'0065 0301 006C 0065 0300 0076 0065'
->>>
->>> s = "⑴ ﬃ ²"
->>> NFC(s), NFKC(s), NFD(s), NFKD(s)
-('⑴ ﬃ ²', '(1) ffi 2', '⑴ ﬃ ²', '(1) ffi 2')
+### Usage examples
 
->>> from pyunormalize import normalize
->>> normalize("NFKD", "⑴ ﬃ ²")
-'(1) ffi 2'
->>> forms = ["NFC", "NFD", "NFKC", "NFKD"]
->>> [normalize(f, "\u017F\u0307\u0323") for f in forms]
-['ẛ̣', 'ẛ̣', 'ṩ', 'ṩ']
+#### Base normalization forms
+This section demonstrates the use of the `NFC`, `NFD`, `NFKC`, and `NFKD` functions for specific normalization tasks.
+```python
+from pyunormalize import NFC, NFD, NFKC, NFKD
+
+# Example string with accented characters
+text = "élève"  # "\u00E9\u006C\u00E8\u0076\u0065"
+
+# Normalize to different forms
+nfc = NFC(text)
+nfd = NFD(text)
+
+# Comparisons
+print(nfc == text)  # True  (NFC preserves the original composed form)
+print(nfd == nfc)   # False (NFD decomposes accented characters)
+
+# Display Unicode code points in hexadecimal
+print("NFC: " + " ".join([f"{ord(c):04X}" for c in nfc]))
+print("NFD: " + " ".join([f"{ord(c):04X}" for c in nfd]))
+# Output:
+# NFC: 00E9 006C 00E8 0076 0065
+# NFD: 0065 0301 006C 0065 0300 0076 0065
+```
+
+#### Using the generic `normalize` function
+The `normalize` function can be used to apply any normalization form programmatically.
+```python
+from pyunormalize import normalize
+
+text = "désaﬃliât"
+print("Input\t" + " ".join([f"{ord(c):04X}" for c in text]))
+
+# Apply each of the four forms
+forms = ["NFC", "NFD", "NFKC", "NFKD"]
+for form in forms:
+    normalized_text = normalize(form, text)
+    hex_repr = " ".join([f"{ord(c):04X}" for c in normalized_text])
+    print(f"{form}\t{hex_repr}")
+
+# Output:
+# Input   0064 00E9 0073 0061 FB03 006C 0069 00E2 0074
+# NFC     0064 00E9 0073 0061 FB03 006C 0069 00E2 0074
+# NFD     0064 0065 0301 0073 0061 FB03 006C 0069 0061 0302 0074
+# NFKC    0064 00E9 0073 0061 0066 0066 0069 006C 0069 00E2 0074
+# NFKD    0064 0065 0301 0073 0061 0066 0066 0069 006C 0069 0061 0302 0074
 ```
 
 ### Related resources
 This implementation is based on the following resources:
-- [Section 3.11, “Normalization Forms,” in the Unicode core specification, version&nbsp;16.0.0](https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/#G49537)
-- [Unicode Standard Annex #15: Unicode Normalization Forms, revision&nbsp;56](https://www.unicode.org/reports/tr15/tr15-56.html)
+- [The Unicode Standard, Version 17.0 – Core Specification, Section&nbsp;3.11: “Normalization Forms”](https://www.unicode.org/versions/Unicode17.0.0/core-spec/chapter-3/#G49537)
+- [Unicode Standard Annex #15: “Unicode Normalization Forms,” revision&nbsp;57](https://www.unicode.org/reports/tr15/tr15-57.html)
 
 ### Licenses
-The code is licensed under the [MIT license](https://github.com/mlodewijck/pyunormalize/blob/master/LICENSE).
+The code is available under the terms of the [MIT license](https://github.com/mlodewijck/pyunormalize/blob/master/LICENSE).
 
-Usage of Unicode data files is subject to the [UNICODE TERMS OF USE](https://www.unicode.org/copyright.html). Additional rights and restrictions regarding Unicode data files and software are outlined in the [Unicode Data Files and Software License](https://www.unicode.org/license.txt), a copy of which is included as [UNICODE-LICENSE](https://github.com/mlodewijck/pyunormalize/blob/master/UNICODE-LICENSE).
+Usage of Unicode data files is governed by the [UNICODE TERMS OF USE](https://www.unicode.org/copyright.html). Further specifications of rights and restrictions pertaining to the use of the Unicode data files and software can be found in the [Unicode Data Files and Software License](https://www.unicode.org/license.txt), a copy of which is included as [UNICODE-LICENSE](https://github.com/mlodewijck/pyunormalize/blob/master/UNICODE-LICENSE).

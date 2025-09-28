@@ -1,25 +1,16 @@
-"""Utility for Unicode normalization.
+"""Unicode normalization.
 
-This is a pure Python implementation of the Unicode normalization algorithm,
-independent of the Python core Unicode database, and ensuring compliance
-with version 16.0 of the Unicode standard (released in September 2024). It has
-been rigorously tested using the official Unicode test file, available
-at https://www.unicode.org/Public/16.0.0/ucd/NormalizationTest.txt.
+This is a pure-Python implementation of the Unicode normalization algorithm.
+Because it relies on data files from the Unicode character database (UCD)
+associated with version 17.0 of the Unicode Standard, it is independent
+of Python's core Unicode database. This approach ensures strict compliance
+with the definitions and rules of that version, released in September 2025.
 
-For the formal specification of the Unicode normalization algorithm,
-see Section 3.11, "Normalization Forms," in the Unicode core specification.
-
-Copyright (c) 2021-2024, Marc Lodewijck
+Copyright (c) 2021-2025, Marc Lodewijck
 All rights reserved.
 
-This software is distributed under the MIT license.
+The code is available under the terms of the MIT license.
 """
-
-import sys
-
-if sys.version_info < (3, 6):
-    raise SystemExit(f"\n{__package__} requires Python 3.6 or later.")
-del sys
 
 __all__ = [
     "NFC",
@@ -32,20 +23,22 @@ __all__ = [
     "__version__",
 ]
 
-# Unicode standard used to process the data
-UNICODE_VERSION = UCD_VERSION = "16.0.0"
-
+# Unicode Standard used to process the data
+UNICODE_VERSION = UCD_VERSION = "17.0.0"
 
 from pyunormalize import _version
+
 __version__ = _version.__version__
 del _version
 
-from pyunormalize._unicode import _UNICODE_VERSION
+from pyunormalize._unicode_data import _UNICODE_VERSION
+
 if _UNICODE_VERSION != UNICODE_VERSION:
-    raise SystemExit(
-        f"Unicode version mismatch in {_unicode.__name__} "
-        f"(expected {UNICODE_VERSION}, found {_UNICODE_VERSION})."
+    raise RuntimeError(
+        f"Unicode version mismatch in '_unicode_data' "
+        f"(expected {UNICODE_VERSION!r}, found {_UNICODE_VERSION!r})"
     )
+
 del _UNICODE_VERSION
 
 from pyunormalize.normalization import *
